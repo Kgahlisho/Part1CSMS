@@ -23,26 +23,30 @@
 
 	<br />
 
+	<br />
+
+	<input type="submit" value="Calculate" />
+
+	<br />
+
+	@if (Model.TotalAmount > 0)
+
+	{
+
+		<h3>Your total claims are : @Model.TotalAmount</h3>
+	}
+
+	<br />
+
 	<p>Supporting Documents :
 		<input type="file" name="uploadFile" id="uploadedFile" />
 	</p>
 
-	<br/>
-
-	<input type="submit"  value="Calculate" />
-
-	<br />
+	
 
 </form>
 
-@if (Model.TotalAmount > 0)
 
-{
-
-	<h3>Your total claims are : @Model.TotalAmount</h3>
-}
-
-<br />
 <!--We then upolad the supporting documents here-->
 <!--
 <p>
@@ -59,4 +63,3 @@
 	{
 		<p style="color:lawngreen">@TempData["UploadMessage"]</p>
 	}
-
