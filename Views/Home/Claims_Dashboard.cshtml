@@ -1,0 +1,46 @@
+﻿@model List<Part1ex.Models.Calculations>
+
+<h1>Welcome to your Claims</h1>
+
+<h1>Total claims made Below: @(Model?.Count ?? 0)</h1>
+
+@if (Model != null && Model.Any())
+{
+<table border="1" cellpadding="5">
+	<thead>
+<tr>
+
+	<th>Claim Number</th>
+	
+	<th>Total claim :</th>
+	<th>Claim date :</th>
+	<th>Documents Uploaded :</th>
+	<th>Claim status :</th>
+</tr>
+	</thead>
+
+<tbody>
+	@for(int i = 0 ; i < Model.Count; i++){<!--We make sure that every new claim they are incremented by one using the for loop-->
+
+<tr>
+	<td>@(i+1)</td><!--claim number increases by one-->
+				<td>@Model[i].TotalAmount</td>
+				<td>@Model[i].ClaimDate.ToString("yyyy-MM-dd")</td>
+				<td>@Model[i].DocumentsUploaded "None"</td> <!--We disply none if nothing has been submitted-->
+				<td>@Model[i].ClaimStatus</td>
+</tr>
+	}
+
+</tbody>
+
+</table>
+<br />
+
+
+}
+
+else
+{<p>No claim made</p>}
+
+
+<a href="@Url.Action("claims","Home")">Make a new claim</a>

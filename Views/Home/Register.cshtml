@@ -1,0 +1,31 @@
+﻿<h1>Welcome to the Register</h1>
+
+<form method="post" action="/Home/Index">
+	<p> Please enter your name :
+	<input type="text"name="name" placeholder="enter your name"/>
+	</p>
+	<p> Select your role :
+		<select>
+				<option value="value">Select Role</option>
+				<option value="Lecturer">Lecture</option>
+				<option value="Program coordinator">Program coordinator</option>
+				<option value="Program  Manager">Program  Manager</option>
+		</select>
+		</p>
+
+<p>Enter your Email :
+	<input type="email" name="email" placeholder="enter your email" />
+	</p>
+	<br />
+
+	<p>Enter Your password :
+	<input type="password" name="password" placeholder="enter password" />
+	</p>
+
+	<br />
+	<input type="submit" value="register" />
+	<p>
+		Have an account?
+		<a href=@Url.Action("Index","Home")>Login here</a>
+	</p>
+</form>

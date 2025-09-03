@@ -1,0 +1,59 @@
+﻿<h1>Welcome to make a claim</h1>
+
+<a href="@Url.Action("Dashboard","Home")"> Dashboard </a>
+<a href="@Url.Action("Claims_Dashboard","Home")"> View claims </a>
+
+<h2>Make a claim</h2>
+
+@model Part1ex.Models.Calculations
+
+<!--here we make sure that the data entered by the user is entered into the following inputs-->
+
+
+<form action="Claims" method="post" enctype="multipart/form-data">
+
+	<p>
+		Enter Hours Worked : <input type="number" name="HoursWorked"   placeholder="Enter Hours Worked" required />
+		</p>
+
+	<br />
+<p> 
+		Enter Hourly Rate : <input type="number" name="HourlyRate"  placeholder="Enter Hourly Rate" required/>
+	</p>
+
+
+	<p>Supporting Documents :
+		<input type="file" name="uploadFile" id="uploadedFile" />
+	</p>
+
+	<input type="submit"  value="Calculate" />
+
+	<br />
+
+</form>
+
+@if (Model.TotalAmount > 0)
+
+{
+
+	<h3>Your total claims are : @Model.TotalAmount</h3>
+}
+
+<br />
+<!--We then upolad the supporting documents here-->
+<!--
+<p>
+	Supporting Documents :
+
+	<form action ="/Home/UploadDocument" method="post" enctype="multipart/form-data">
+		<input type="file" name="uploadFile" id="uploadedFile" />
+		<input type="submit" value="upload" />
+		
+	</form>
+	-->
+
+	@if (TempData["UploadMessage"]!=null)
+	{
+		<p style="color:lawngreen">@TempData["UploadMessage"]</p>
+	}
+
