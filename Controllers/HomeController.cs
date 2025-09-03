@@ -82,19 +82,23 @@ namespace Part1ex.Controllers
         //and we calculate the hourly rate of the hours worked and submit the final value to them
         public IActionResult Claims(Calculations? model ,IFormFile uploadFile)
         {
-            if (model !=null && model.HoursWorked >0 && model.HourlyRate >0)
+            if (model != null && model.HoursWorked > 0 && model.HourlyRate > 0)
             {
-                    model.TotalAmount = model.HoursWorked * model.HourlyRate;
-                    model.ClaimDate = DateTime.Now;
+                model.TotalAmount = model.HoursWorked * model.HourlyRate;
+                model.ClaimDate = DateTime.Now;
                 model.ClaimStatus = "pending";
 
-                //then we add to a list 
+                model.DocumentsUploaded = uploadFile != null && uploadFile.Length > 0
+                    ? uploadFile.FileName : null;
+
                 claimsList.Add(model);
-                
-                
-                return View(model);
-            }
-            return View(new Calculations());
+
+
+             TempData["UploadMessage"] = model.DocumentsUploaded != null
+                    ? $"File'{uploadFile.FileName}' uploaded successfully." :"No file uploaded";
+                }
+                //then we add to a list 
+          return View(model);
         }
 
 

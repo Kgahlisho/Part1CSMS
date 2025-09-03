@@ -26,7 +26,7 @@
 	<td>@(i+1)</td><!--claim number increases by one-->
 				<td>@Model[i].TotalAmount</td>
 				<td>@Model[i].ClaimDate.ToString("yyyy-MM-dd")</td>
-				<td>@Model[i].DocumentsUploaded "None"</td> <!--We disply none if nothing has been submitted-->
+				<td>@(Model[i].DocumentsUploaded ?? "None")</td> <!--We disply none if nothing has been submitted-->
 				<td>@Model[i].ClaimStatus</td>
 </tr>
 	}
