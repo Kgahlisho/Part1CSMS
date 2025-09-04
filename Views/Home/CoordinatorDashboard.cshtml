@@ -1,6 +1,24 @@
 ﻿@model List<Part1ex.Models.Calculations>
 <h2>Welcome ,@ViewBag.UserName! to the Coordinators Dashboard</h2>
 
+
+@if (TempData["Message"] != null)
+{
+	<p style="color:green">@TempData["Message"]</p>
+}
+
 <p>This is the Program coordinators Dashboard.</p>
 
-@if (Model.Count==0)
+<br />
+
+
+<p>
+	<a href="@Url.Action("ViewClaims","Home")">View Submitted Claims</a>
+</p>
+
+
+
+<p>
+	<a href="@Url.Action("Index","Home")">Back to Login Page</a>
+</p>
+

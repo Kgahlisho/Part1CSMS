@@ -15,6 +15,7 @@ namespace Part1ex.Models
         public DateTime ClaimDate { get; set; }
         public string? DocumentsUploaded { get; set; }
         public string? ClaimStatus { get; set; } = "pending";
+        public string Lecturer { get; set; }
     }
     
 }

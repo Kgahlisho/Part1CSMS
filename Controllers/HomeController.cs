@@ -116,10 +116,11 @@ namespace Part1ex.Controllers
             {
                 model.TotalAmount = model.HoursWorked * model.HourlyRate;
                 model.ClaimDate = DateTime.Now;
-                model.ClaimStatus = "pending";
+                model.ClaimStatus = "Pending";
 
                 model.DocumentsUploaded = uploadFile != null && uploadFile.Length > 0
                     ? uploadFile.FileName : null;
+                model.Lecturer = HttpContext.Session.GetString("UserName");
 
                 claimsList.Add(model);
 
@@ -183,7 +184,7 @@ namespace Part1ex.Controllers
 
 
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
-            return View(claimsList);
+            return View();
         }
 
         public IActionResult ManagerDashboard() {
@@ -198,6 +199,43 @@ namespace Part1ex.Controllers
             return View();
         }
 
+        public IActionResult ApproveClaim(int index)
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Program Coordinator")
+                return RedirectToAction("Index");
+
+            if (index >= 0 && index < claimsList.Count)
+            {
+                claimsList[index].ClaimStatus = "Approved";
+                TempData["Message"] = $"Claim {index + 1} approved";
+            }
+            return RedirectToAction("CoordinatorDashboard");
+        }
+
+        public IActionResult RejectClaim(int index)
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role !="Program Coordinator")
+                return RedirectToAction("Index");
+
+            if (index >= 0 && index < claimsList.Count)
+            {
+                claimsList[index].ClaimStatus = "Rejected";
+                TempData["Message"] = $"Claim {index + 1} rejected.";
+            }
+            return RedirectToAction("CoordinatorDashboard");
+        }
+
+        public IActionResult ViewClaims()//for the coordinator to be able to t=see the claims made by lecturer
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Program Coordinator")
+                return RedirectToAction("Index");
+
+            ViewBag.UserName = HttpContext.Session.GetString("UserName");
+            return View("ViewClaims", claimsList);
+        }
 
 
 
