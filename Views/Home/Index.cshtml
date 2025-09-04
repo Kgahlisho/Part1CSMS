@@ -7,20 +7,35 @@
 <!--take in the user information using a form-->
 <!--the action form will redirectyou to the dashboard as indicated-->
 
-<form methods="post" action="/Home/Dashboard">
+
+
+<form method="post" action="@Url.Action("Login","Home")">
 
     <p> Please enter your email :
-    <input type="email" placeholder="enter email" />
+    <input type="email" name="Email" placeholder="enter email" required/>
     </p>
 
     <br />
     <p> Please enter your password :
-    <input type="Password" placeholder="enter password" />
+    <input type="Password" name="Password" placeholder="enter password" required/>
     </p>
     
     <br />
 
     <input type="Submit" value="login" />
+
+    <br/>
+
+    <!--Error messege if the users details dont match any records-->
+    @if (TempData["LoginError"] != null)
+    {
+        <p style="color:red">@TempData["LoginError"]</p>
+    }
+    <!--The successfully logged in-->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <p style="color:green">@TempData["SuccessMessage"]</p>
+    }
 
 
     <!--link too open register-->

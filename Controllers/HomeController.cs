@@ -36,6 +36,30 @@ namespace Part1ex.Controllers
          }
         */
         //we first check that the information is provided first so hence the null , then add the user into the rolesdown list sue swith to send the user to the corrct dashbpard 
+      //then we can make sure that the username and details that they entered are correct if not error messege appears
+        public IActionResult Login(string Email, string Password)
+        {
+            var user = RolesDown.Roles.FirstOrDefault(mem => mem.Email == Email && mem.Password == Password);
+        
+            if (user !=null)
+            {
+                HttpContext.Session.SetString("UserRole", user.Role);
+                HttpContext.Session.SetString("UserName", user.Name);
+
+                return user.Role switch
+                {
+
+                    "Lecturer" => RedirectToAction("Dashboard"),
+                    "Program Coordinator" => RedirectToAction("CoordinatorDashboard"),
+                    "Program Manager" => RedirectToAction("ManagerDashboard"),
+                    _ => RedirectToAction("Dashboard")
+                };
+            }
+            TempData["LoginError"] = "Invalid email or password ";
+            return RedirectToAction("Index");
+        }
+
+
         public IActionResult Register(string Name = null, string Email = null, string Password = null, string Role = null)
         {
             if (!string.IsNullOrEmpty(Name)  &&
@@ -51,19 +75,19 @@ namespace Part1ex.Controllers
                     Role = Role
                 });
 
-                TempData["UserRole"] = Role;
-                TempData["UserName"] = Name;
+                TempData["SuccessMessage"] = "Registration Susccessful . please login";
+                return RedirectToAction("Index");
+                /*
+                HttpContext.Session.SetString("UserRole", Role);
+                HttpContext.Session.SetString("UserName", Name);
 
                 return Role switch
                 {
-                    "Lecturer" =>
-                        RedirectToAction("LecturerDashboard"),
-                    "program Coordinator" =>
-                        RedirectToAction("CoordinatorDashboard"),
-                    "ProgramManager" =>
-                        RedirectToAction("ManagerDashboard"),
-                    _ => RedirectToAction("UserBoard")
-                };
+                    "Lecturer" => RedirectToAction("Dashboard"),
+                    "Program Coordinator" => RedirectToAction("CoordinatorDashboard"),
+                    "Program Manager" => RedirectToAction("ManagerDashboard"),
+                    _ => RedirectToAction("Dashboard")
+                };*/
             }
             return View();
         }
@@ -73,6 +97,12 @@ namespace Part1ex.Controllers
 
         public IActionResult Dashboard()
         {
+
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Lecturer") return RedirectToAction("Index");
+
+            ViewBag.UserName = HttpContext.Session.GetString("UserName");
+
             return View();
         }
 
@@ -143,6 +173,31 @@ namespace Part1ex.Controllers
             }
             return  RedirectToAction("Claims");
         }
+
+        //We then create dashboards for the other roles 
+        public IActionResult CoordinatorDashboard()
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Program Coordinator")
+                return RedirectToAction("Dashboard");
+
+
+            ViewBag.UserName = HttpContext.Session.GetString("UserName");
+            return View(claimsList);
+        }
+
+        public IActionResult ManagerDashboard() {
+
+            var role = HttpContext.Session.GetString("UserRole");
+
+            if (role!= "Program Manager")
+                return RedirectToAction("Dashboard");
+
+
+            ViewBag.UserName = HttpContext.Session.GetString("UserName");
+            return View();
+        }
+
 
 
 
