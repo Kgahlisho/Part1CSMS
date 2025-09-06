@@ -1,6 +1,49 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyClaims</title>
+    <link rel="stylesheet" href="~/css/site.css?v=@DateTime.Now.Ticks" />
+</head>
+<body>
+    @{
+        var userRole = Context.Session.GetString("UserRole");
+    }
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="@Url.Action("Index","Home")" class="logo">
+                <img src="/resources/file_icon.png" alt="csms logo" class="logo-img" />
+            </a>
+
+            <div class="nav-links">
+                @if ((userRole) == "Lecturer")
+                {
+                    <a href="@Url.Action("Dashboard","Home")">Dashboard</a>
+                    <a href="@Url.Action("Claims","Home")">Make Claim</a>
+                    <a href="@Url.Action("Claims_Dashboard","Home")">View Claims</a>
+                }
+                else if ((userRole) == "Program Coordinator")
+                {
+                    <a href="@Url.Action("CoordinatorDashboard","Home")">Coordinator Dashboard</a>
+                    <a href="@Url.Action("ViewClaims","Home")">View Submitted Claims</a>
+                }
+                else if ((userRole) == "Program Manager")
+                {
+                    <a href="@Url.Action("ManagerDashboard","Home")">Manager Dashboard</a>
+                }
+
+                <a href="@Url.Action("Logout","Home")" class="logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
+</body>
+</html>

@@ -1,14 +1,12 @@
-﻿<h1>Welcome to the Dashboard</h1>
+﻿<h1 class="dashboard-heading">Welcome to the Dashboard</h1>
 
 
-<div class="buttons">
+<div class="buttons" style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
 
-	<a href="@Url.Action("Claims","Home")" class="btn btn-primary"> Make a claim</a>
-	<a href="@Url.Action("Claims_Dashboard","Home")" class="btn btn-secondary"> View claims </a>
+	<a href="@Url.Action("Claims","Home")" class="btn btn-success"> Make a claim</a>
+	<br />
+	<a href="@Url.Action("Claims_Dashboard","Home")" class="btn btn-primary"> Track claims </a>
+	<br />
 
-
-	<p>
-		<a href="@Url.Action("Index","Home")" class="btn btn-outline-secondary">Back to login page</a>
-	</p>
 
 	</div>

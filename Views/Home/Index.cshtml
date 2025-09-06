@@ -1,51 +1,67 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+<div class="card-container">
+
+    <div class="icon-header">
+        <img src="~/resources/profile_user.png" alt="user" class="user-icon" />
+       </div>
+    <h1 class="dashboard-heading-mini">Welcome to the login page</h1>
 
 
-<h2>Welcome to the login page</h2>
-<!--take in the user information using a form-->
+    <!--take in the user information using a form-->
 <!--the action form will redirectyou to the dashboard as indicated-->
+   @if (TempData["LoginError"] != null)
+    {
+        <div class="alert alert-error">@TempData["LoginError"]</div>
+    }
+     
 
 
+    <form method="post" action="@Url.Action("Login","Home")">
 
-<form method="post" action="@Url.Action("Login","Home")">
+    
 
-    <p> Please enter your email :
-    <input type="email" name="Email" placeholder="enter email" required/>
-    </p>
+    <label> Please enter your email :
+    <input type="email" name="Email" placeholder="enter email" /><!--This one has to be required for part2-->
+    </label>
 
-    <br />
-    <p> Please enter your password :
-    <input type="Password" name="Password" placeholder="enter password" required/>
-    </p>
+    <label> Please enter your password :
+    <input type="Password" name="Password" placeholder="enter password" /><!--This one has to be required for part 2-->
+    </label>
+
+    <label>Please select a role:</label>
+    
+        <label>
+            
+            <select name="Role">
+                <option value="">Choose role : </option>
+                <option value="Lecturer">Lecturer</option>
+                <option value="Program Coordinator">Program Coordinator</option>
+                <option value="Program Manager">Program  Manager</option>
+            </select>
+        </label>
     
     <br />
+    <div class="buttons">
+    <button type="Submit" class="btn btn-primary" >Login</button>
+        </div>
 
-    <input type="Submit" value="login" />
-
+        <label class="mini">
+            Dont have an account ?
+            <a href=@Url.Action("Register","Home")> Register Here. </a>
+        </label>
     <br/>
-
+       
+      
     <!--Error messege if the users details dont match any records-->
-    @if (TempData["LoginError"] != null)
-    {
-        <p style="color:red">@TempData["LoginError"]</p>
-    }
-    <!--The successfully logged in-->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <p style="color:green">@TempData["SuccessMessage"]</p>
-    }
-
-
-    <!--link too open register-->
-
-
-
-    <p>
-        i dont have an account
-        <a href=@Url.Action("Register","Home")>register now</a>
-    </p>
-
-
+    
 </form>
+    
+
+
+
+    
+
+
+</div>

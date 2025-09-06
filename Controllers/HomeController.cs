@@ -8,9 +8,9 @@ namespace Part1ex.Controllers
     //create an im-memeory storage for incoming and new claims which is temporary
     public class HomeController : Controller
     {
-       private static List<Calculations> claimsList = new List<Calculations>(); 
-    
-    
+        private static List<Calculations> claimsList = new List<Calculations>();
+
+
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -36,10 +36,10 @@ namespace Part1ex.Controllers
          }
         */
         //we first check that the information is provided first so hence the null , then add the user into the rolesdown list sue swith to send the user to the corrct dashbpard 
-      //then we can make sure that the username and details that they entered are correct if not error messege appears
-        public IActionResult Login(string Email, string Password)
+        //then we can make sure that the username and details that they entered are correct if not error messege appears
+        public IActionResult Login(string Email, string Password, string role = null)
         {
-            var user = RolesDown.Roles.FirstOrDefault(mem => mem.Email == Email && mem.Password == Password);
+            /*var user = RolesDown.Roles.FirstOrDefault(mem => mem.Email == Email && mem.Password == Password);
         
             if (user !=null)
             {
@@ -57,40 +57,59 @@ namespace Part1ex.Controllers
             }
             TempData["LoginError"] = "Invalid email or password ";
             return RedirectToAction("Index");
+*/
+            if (!string.IsNullOrEmpty(role))
+            {
+                HttpContext.Session.SetString("UserRole", role);
+                HttpContext.Session.SetString("UserName", $"Test{role}");
+                return role switch
+                {
+                    "Lecturer" => RedirectToAction("Dashboard"),
+                    "Program Coordinator" => RedirectToAction("CoordinatorDashboard"),
+                    "Program Manager" => RedirectToAction("ManagerDashboard"),
+                    _ => RedirectToAction("Dashboard")
+                };
+            }
+
+            TempData["LoginError"] = "Invalid email or password ";
+            return RedirectToAction("Index");
+
         }
 
 
-        public IActionResult Register(string Name = null, string Email = null, string Password = null, string Role = null)
+        public IActionResult Register(string Name = null, string Email = null, string Password = null)
         {
-            if (!string.IsNullOrEmpty(Name)  &&
-                !string.IsNullOrEmpty(Email) &&
-                !string.IsNullOrEmpty(Password) &&
-                !string.IsNullOrEmpty(Role))
-            {
-                RolesDown.Roles.Add(new Rol
-                {
-                    Name = Name,
-                    Email = Email,
-                    Password = Password,
-                    Role = Role
-                });
+            if (Request.Method == "POST") { //can be able to redirect to register 
 
-                TempData["SuccessMessage"] = "Registration Susccessful . please login";
-                return RedirectToAction("Index");
-                /*
+            TempData["SuccessMessage"] = "Registration Susccessful . please login";
+            return RedirectToAction("Index");
+
+
+                /* if (!string.IsNullOrEmpty(Name) &&
+                     !string.IsNullOrEmpty(Email) &&
+                     !string.IsNullOrEmpty(Password))
+                 {
+                )
                 HttpContext.Session.SetString("UserRole", Role);
                 HttpContext.Session.SetString("UserName", Name);
 
                 return Role switch
                 {
                     "Lecturer" => RedirectToAction("Dashboard"),
-                    "Program Coordinator" => RedirectToAction("CoordinatorDashboard"),
-                    "Program Manager" => RedirectToAction("ManagerDashboard"),
-                    _ => RedirectToAction("Dashboard")
-                };*/
+                "Program Coordinator" => RedirectToAction("CoordinatorDashboard"),
+                "Program Manager" => RedirectToAction("ManagerDashboard"),
+                        _ => RedirectToAction("Dashboard")
+                    };
+                }
+                    return View();
+                }
+                */
             }
+
             return View();
         }
+
+
 
 
         //action method to navigate to the dashboard page
@@ -159,6 +178,8 @@ namespace Part1ex.Controllers
             return View(claimsList);
         }
 
+
+
         //thehn here we make sure that the documents are uploaded and it taks us back to the claims
         public IActionResult UploadDocument(IFormFile uploadFile)
         {
@@ -174,6 +195,8 @@ namespace Part1ex.Controllers
             }
             return  RedirectToAction("Claims");
         }
+
+
 
         //We then create dashboards for the other roles 
         public IActionResult CoordinatorDashboard()
@@ -196,10 +219,12 @@ namespace Part1ex.Controllers
 
 
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
-            return View();
+
+            var verifiedClaims = claimsList.Where(c=>c.ClaimStatus == "Verified").ToList();
+            return View(verifiedClaims);
         }
 
-        public IActionResult ApproveClaim(int index)
+        public IActionResult ApproveClaim(int index)//this is for the coordinator
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Program Coordinator")
@@ -207,13 +232,13 @@ namespace Part1ex.Controllers
 
             if (index >= 0 && index < claimsList.Count)
             {
-                claimsList[index].ClaimStatus = "Approved";
-                TempData["Message"] = $"Claim {index + 1} approved";
+                claimsList[index].ClaimStatus = "Verified";
+                TempData["Message"] = $"Claim {index + 1} Verified";
             }
             return RedirectToAction("CoordinatorDashboard");
         }
 
-        public IActionResult RejectClaim(int index)
+        public IActionResult RejectClaim(int index)//this is for the coordinator
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role !="Program Coordinator")
@@ -221,11 +246,53 @@ namespace Part1ex.Controllers
 
             if (index >= 0 && index < claimsList.Count)
             {
-                claimsList[index].ClaimStatus = "Rejected";
-                TempData["Message"] = $"Claim {index + 1} rejected.";
+                claimsList[index].ClaimStatus = "Denied";
+                TempData["Message"] = $"Claim {index + 1} Denied";
             }
             return RedirectToAction("CoordinatorDashboard");
         }
+
+        public IActionResult ApproveClaimManager(int index)
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Program Manager")
+                return RedirectToAction("Index");
+
+            // Check for valid index and that the claim is Verified
+            if (index >= 0 && index < claimsList.Count && claimsList[index].ClaimStatus == "Verified")
+            {
+                claimsList[index].ClaimStatus = "Approved";
+                TempData["Message"] = $"Claim {index + 1} Approved successfully.";
+            }
+            else
+            {
+                TempData["Message"] = "Invalid claim selection or claim is not verified.";
+            }
+
+            return RedirectToAction("ManagerDashboard");
+        }
+
+        public IActionResult RejectClaimManager(int index)
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Program Manager")
+                return RedirectToAction("Index");
+
+            // Check for valid index and that the claim is Verified
+            if (index >= 0 && index < claimsList.Count && claimsList[index].ClaimStatus == "Verified")
+            {
+                claimsList[index].ClaimStatus = "Denied";
+                TempData["Message"] = $"Claim {index + 1} Denied successfully.";
+            }
+            else
+            {
+                TempData["Message"] = "Invalid claim selection or claim is not verified.";
+            }
+
+            return RedirectToAction("ManagerDashboard");
+        }
+
+
 
         public IActionResult ViewClaims()//for the coordinator to be able to t=see the claims made by lecturer
         {
@@ -237,6 +304,12 @@ namespace Part1ex.Controllers
             return View("ViewClaims", claimsList);
         }
 
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index");
+        }
 
 
 

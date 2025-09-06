@@ -1,46 +1,62 @@
-﻿<h1>Welcome to make a claim</h1>
+﻿@model Part1ex.Models.Calculations
 
-<a href="@Url.Action("Dashboard","Home")"> Dashboard </a>
-<a href="@Url.Action("Claims_Dashboard","Home")"> View claims </a>
+<div class="buttons" style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
 
-<h2>Make a claim</h2>
+	<a class="btn btn-primary" href="@Url.Action("Dashboard","Home")"> Dashboard </a>
+	<a class="btn btn-primary" href="@Url.Action("Claims_Dashboard","Home")"> View claims </a>
+</div>
 
-@model Part1ex.Models.Calculations
+<div class="card-container">
+	<br/>
+
+	<h1 class="dashboard-heading-run">Welcome to make a claim</h1>
+
+
+
+
+	<h1 class="dashboard-heading-run">Make a claim</h1>
 
 <!--here we make sure that the data entered by the user is entered into the following inputs-->
 
 
 <form action="Claims" method="post" enctype="multipart/form-data">
 
-	<p>
+	<label>
 		Enter Hours Worked : <input type="number" name="HoursWorked"   placeholder="Enter Hours Worked" required />
-		</p>
+		</label>
 
 	<br />
-<p> 
+<label> 
 		Enter Hourly Rate : <input type="number" name="HourlyRate"  placeholder="Enter Hourly Rate" required/>
-	</p>
+	</label>
 
 	<br />
 
 	<br />
-
-	<input type="submit" value="Calculate" />
+	<div class="buttons">
+	<button type="submit" class="btn btn-primary">Submit claim</button>
+	</div>
 
 	<br />
 
+	<div class="Totalclaims">
 	@if (Model.TotalAmount > 0)
 
 	{
 
-		<h3>Your total claims are : @Model.TotalAmount</h3>
+		<h3 class="run">Your total claims are : @Model.TotalAmount</h3>
 	}
+		</div>
 
 	<br />
 
-	<p>Supporting Documents :
+	<label>Supporting Documents :
 		<input type="file" name="uploadFile" id="uploadedFile" />
-	</p>
+	</label>
+		@if (TempData["UploadMessage"] != null)
+		{
+			<div class="alert alert-success">@TempData["UploadMessage"]</div>
+		}
 
 	
 
@@ -59,7 +75,5 @@
 	</form>
 	-->
 
-	@if (TempData["UploadMessage"]!=null)
-	{
-		<p style="color:lawngreen">@TempData["UploadMessage"]</p>
-	}
+	
+</div>

@@ -1,10 +1,13 @@
 ﻿@model List<Part1ex.Models.Calculations>
-<h2>Welcome ,@ViewBag.UserName! to the Coordinators Dashboard</h2>
+
+<div class="container"
+	>
+	<h2 class="dashboard-heading">Welcome ,@ViewBag.UserName! to the Coordinators Dashboard</h2>
 
 
 @if (TempData["Message"] != null)
 {
-	<p style="color:green">@TempData["Message"]</p>
+		<div class="alert alert-success">@TempData["Message"]</div>
 }
 
 <p>This is the Program coordinators Dashboard.</p>
@@ -12,13 +15,10 @@
 <br />
 
 
-<p>
-	<a href="@Url.Action("ViewClaims","Home")">View Submitted Claims</a>
-</p>
+	<div class="buttons" style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
+		<a class="btn btn-primary" href="@Url.Action("ViewClaims","Home")">View Submitted Claims</a>
 
+	</div>
 
-
-<p>
-	<a href="@Url.Action("Index","Home")">Back to Login Page</a>
-</p>
+</div>
 

@@ -1,12 +1,22 @@
 ﻿@model List<Part1ex.Models.Calculations>
 
-<h1>Welcome to your Claims</h1>
 
-<h1>Total claims made Below: @(Model?.Count ?? 0)</h1>
+
+<div style="margin-top: 1.5rem;">
+	<a class="btn btn-primary" href="@Url.Action("Dashboard", "Home")">Back to Dashboard</a>
+</div>
+	<div class="container">
+
+
+	<br />
+
+<h1 class="dashboard-heading">Welcome to your Claims</h1>
+
+	<h2 class="dashboard-heading">Total claims made Below: @(Model?.Count ?? 0)</h2>
 
 @if (Model != null && Model.Any())
 {
-<table border="1" cellpadding="5">
+<table >
 	<thead>
 <tr>
 
@@ -27,26 +37,26 @@
 				<td>@Model[i].TotalAmount</td>
 				<td>@Model[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 				<td>@(Model[i].DocumentsUploaded ?? "None")</td> <!--We disply none if nothing has been submitted-->
-				<td>@Model[i].ClaimStatus</td>
+						<td>
+							<span class="badge @(Model[i].ClaimStatus.ToLower())">
+								@Model[i].ClaimStatus</span>
+						</td>
 </tr>
 	}
 
 </tbody>
 
 </table>
-<br />
 
 
+		<div style="margin-top: 1.5rem;" class="buttons">
+			<a class="btn btn-success" href="@Url.Action("Claims", "Home")">Submit a New Claim</a>
+			</div>
 }
 
 else
-{<p>No claim made</p>}
+{<p class="alert alert-info">No claim made yet</p>}
 
 
-<a href="@Url.Action("claims","Home")">Make a new claim</a>
 
-
-<p>
-	<a href="@Url.Action("Dashboard","Home")">Back to Dashboard</a>
-</p>
-
+</div>

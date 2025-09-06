@@ -1,31 +1,48 @@
-﻿<h1>Welcome to the Register</h1>
+﻿<div class="card-container">
+
+	<div class="icon-header">
+		<img src="~/resources/profile_user.png" alt="user" class="user-icon" />
+	</div>
+
+
+	<h1 class="dashboard-heading-mini">Welcome to the Register</h1>
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert alert-success">@TempData["SuccessMessage"]</div>
+	}
+
 
 <form method="post" action="@Url.Action("Register","Home")">
-	<p> Please enter your name :
+	<label> Please enter your name :
 	<input type="text"name="name" placeholder="enter your name"/>
-	</p>
-	<p> Select your role :
-		<select name="Role" required>
-				<option value="">Select Role</option>
-				<option value="Lecturer">Lecturer</option>
-				<option value="Program Coordinator">Program Coordinator</option>
-				<option value="Program Manager">Program  Manager</option>
-		</select>
-		</p>
+	</label>
 
-<p>Enter your Email :
-	<input type="email" name="Email" placeholder="enter your email" required/>
-	</p>
-	<br />
 
-	<p>Enter Your password :
-	<input type="password" name="Password" placeholder="enter password" required />
-	</p>
+		<label>
+			Enter your Email :
+			<input type="email" name="Email" placeholder="enter your email" />
+		</label>
+
+
+		<label>
+			Enter Your password :
+			<input type="password" name="Password" placeholder="enter password"  />
+		</label>
+
+	
 
 	<br />
-	<input type="submit" value="Register" />
-	<p>
-		Have an account?
-		<a href=@Url.Action("Index","Home")>Login here</a>
-	</p>
+
+
+	<br />
+		<div class="buttons">
+			<button type="submit" class="btn btn-primary"> Register </button>
+		</div>
+
+		<label class="mini">
+			Have an account?
+			<a href=@Url.Action("Index","Home")> Login here. </a>
+		</label>
+
 </form>
+</div>

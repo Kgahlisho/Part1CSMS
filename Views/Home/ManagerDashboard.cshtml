@@ -1,3 +1,62 @@
-﻿<h2>Welcome ,@ViewBag.UserName! to the Managers Dashboard</h2>
+﻿@model List<Part1ex.Models.Calculations>
 
-<p>This is the Program Managers Dashboard.</p>
+
+
+    <a class="btn btn-primary" href="@Url.Action("ManagerDashboard","Home")"> Back to Dashboard</a>
+
+<div class="container">
+
+
+<br />
+	<h2 class="dashboard-heading">Verified claims awaiting approval :</H2>
+
+
+@if (Model == null || !Model.Any(c => c.ClaimStatus =="Verified"))
+{
+	<div class="alert alert-info">No claims submitted yet.</div>
+
+}
+else
+{
+	<table >
+		<thead>
+		<tr>
+			<th>Lecturer name :</th>
+			<th>Hours Worked :</th>
+			<th>Hourly Rate :</th>
+			<th>Total Amount :</th>
+			<th>Documents :</th>
+			<th>Claim date :</th>
+			<th>Claim Status :</th>
+			<th>Actions :</th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var claim in Model.Where(c => c.ClaimStatus == "Verified"))
+{
+    <tr>
+        <td>@claim.Lecturer</td>
+        <td>@claim.HoursWorked</td>
+        <td>@claim.HourlyRate</td>
+        <td>@claim.TotalAmount</td>
+        <td>@claim.DocumentsUploaded</td>
+        <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+        <td><span class="badge @(claim.ClaimStatus.ToLower())">@claim.ClaimStatus</span></td>
+        <td>
+            <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaimManager" , "Home", new {index = Model.IndexOf(claim)})">Approve</a>
+            <br />
+            <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaimManager" , "Home", new {index = Model.IndexOf(claim)})">Reject</a>
+        </td>
+    </tr>
+}
+		</tbody>
+
+
+
+	</table>
+	@if (TempData["Message"] != null)
+    {
+        <p style="color:green">@TempData["Message"]</p>
+    }
+}
+</div>
