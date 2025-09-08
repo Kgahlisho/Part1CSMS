@@ -21,6 +21,7 @@ else
 	<table >
 		<thead>
 		<tr>
+			<th>Claim id :</th>
 			<th>Lecturer name :</th>
 			<th>Hours Worked :</th>
 			<th>Hourly Rate :</th>
@@ -35,6 +36,7 @@ else
 		@foreach (var claim in Model.Where(c => c.ClaimStatus == "Verified"))
 {
     <tr>
+		<td>@claim.claimid</td>
         <td>@claim.Lecturer</td>
         <td>@claim.HoursWorked</td>
         <td>@claim.HourlyRate</td>

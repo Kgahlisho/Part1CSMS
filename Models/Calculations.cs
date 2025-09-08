@@ -4,6 +4,7 @@ namespace Part1ex.Models
 {
     public class Calculations 
     {
+       public int claimid { get; set; }
         public int HoursWorked { get; set; }
 
         public int HourlyRate { get; set; }

@@ -16,6 +16,11 @@ namespace Part1ex.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+
+            if(!claimsList.Any())
+            {
+                claimsList.AddRange(TestClaims.Claims);
+            }
         }
 
         public IActionResult Index()
@@ -71,7 +76,7 @@ namespace Part1ex.Controllers
                 };
             }
 
-            TempData["LoginError"] = "Invalid email or password ";
+            TempData["LoginError"] = "Invalid email , password or choose role. ";
             return RedirectToAction("Index");
 
         }
@@ -129,6 +134,9 @@ namespace Part1ex.Controllers
         //lets test how the one single IActionResult work and if it does catch  exceptions
         //we make sure that the user doesnt enter null values and every value is bigger than 0
         //and we calculate the hourly rate of the hours worked and submit the final value to them
+
+        private static int nextClaimId = 1;
+        
         public IActionResult Claims(Calculations? model ,IFormFile uploadFile)
         {
             if (model != null && model.HoursWorked > 0 && model.HourlyRate > 0)
@@ -140,6 +148,9 @@ namespace Part1ex.Controllers
                 model.DocumentsUploaded = uploadFile != null && uploadFile.Length > 0
                     ? uploadFile.FileName : null;
                 model.Lecturer = HttpContext.Session.GetString("UserName");
+                model.claimid = nextClaimId++; 
+                //claimsList.Count > 0 ? claimsList.Max(c => c.claimid) + 1; 
+                //nextClaimId++;
 
                 claimsList.Add(model);
 
