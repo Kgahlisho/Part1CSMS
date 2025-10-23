@@ -21,16 +21,16 @@ else
 	<table >
 		<thead>
 		<tr>
-			<th>Claim id:</th>
-			<th>Lecturer name :</th>
-			<th>Hours Worked :</th>
-			<th>Hourly Rate :</th>
-			<th>Total Amount :</th>
-			<th>Documents :</th>
-			<th>Claim date :</th>
-			<th>Claim Status :</th>
-			<th>Actions :</th>
-			<th>Status :</th>
+			<th>Claim id</th>
+			<th>Lecturer name </th>
+			<th>Hours Worked </th>
+			<th>Hourly Rate </th>
+			<th>Total Amount </th>
+			<th>Documents </th>
+			<th>Claim date </th>
+			<th>Claim Status </th>
+			<th>Actions </th>
+			<th>Status </th>
 		</tr>
 		</thead>
 		<tbody>
@@ -52,9 +52,9 @@ else
 					<td>
 					@if (claim.ClaimStatus == "Pending")
 					{
-						<a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaim" , "Home", new {index = i})">Verify</a>
+						<a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaim" , "Home", new { claimid = claim.claimid})">Verify</a>
 						<br />
-						<a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaim" , "Home", new {index = i})">Deny</a>
+						<a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaim" , "Home", new { claimid = claim.claimid})">Deny</a>
 					}
 					else
 					{

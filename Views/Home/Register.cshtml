@@ -6,29 +6,36 @@
 
 
 	<h1 class="dashboard-heading-mini">Welcome to the Register</h1>
-	@if (TempData["SuccessMessage"] != null)
-	{
-		<div class="alert alert-success">@TempData["SuccessMessage"]</div>
-	}
-
+	
 
 <form method="post" action="@Url.Action("Register","Home")">
 	<label> Please enter your name :
-	<input type="text"name="name" placeholder="enter your name"/>
+	<input type="text"name="Name" placeholder="enter your name" required/>
 	</label>
 
 
 		<label>
 			Enter your Email :
-			<input type="email" name="Email" placeholder="enter your email" />
+			<input type="Email" name="Email" placeholder="enter your email"  required/>
 		</label>
 
 
 		<label>
 			Enter Your password :
-			<input type="password" name="Password" placeholder="enter password"  />
+			<input type="Password" name="Password" placeholder="enter password" required />
 		</label>
 
+		<label>Please select a role:</label>
+
+		<label>
+
+			<select name="Role" required>
+				<option value="">Choose role : </option>
+				<option value="Lecturer">Lecturer</option>
+				<option value="Program Coordinator">Program Coordinator</option>
+				<option value="Program Manager">Program  Manager</option>
+			</select>
+		</label>
 	
 
 	<br />
@@ -43,6 +50,16 @@
 			Have an account?
 			<a href=@Url.Action("Index","Home")> Login here. </a>
 		</label>
+
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<div class="alert alert-success">@TempData["SuccessMessage"]</div>
+		}
+		@if (TempData["RegisterError"] != null)
+		{
+			<div class="alert alert-error">@TempData["RegisterError"]</div>
+		}
+
 
 </form>
 </div>

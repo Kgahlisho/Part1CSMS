@@ -19,12 +19,12 @@
 <table >
 	<thead>
 <tr>
-	<th>Claim id :</th>
-	<th>Claim :</th>
-	<th>Total claim :</th>
-	<th>Claim date :</th>
-	<th>Documents Uploaded :</th>
-	<th>Claim status :</th>
+	<th>Claim id </th>
+	<th>Claim </th>
+	<th>Total claim </th>
+	<th>Claim date </th>
+	<th>Documents Uploaded </th>
+	<th>Claim status </th>
 </tr>
 	</thead>
 
@@ -34,11 +34,11 @@
 <tr>
 	<td>@(i+1)</td><!--claim number increases by one-->
 	<td>@Model[i].claimid</td>
-				<td>@Model[i].TotalAmount</td>
+				<td>@Model[i].TotalAmount.ToString("R")</td>
 				<td>@Model[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 				<td>@(Model[i].DocumentsUploaded ?? "None")</td> <!--We disply none if nothing has been submitted-->
 						<td>
-							<span class="badge @(Model[i].ClaimStatus.ToLower())">
+							<span class="badge @(Model[i].ClaimStatus?.ToLower()?? "pending")">
 								@Model[i].ClaimStatus</span>
 						</td>
 </tr>

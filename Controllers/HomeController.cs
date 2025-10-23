@@ -9,7 +9,7 @@ namespace Part1ex.Controllers
     public class HomeController : Controller
     {
         private static List<Calculations> claimsList = new List<Calculations>();
-
+        
 
         private readonly ILogger<HomeController> _logger;
 
@@ -42,11 +42,17 @@ namespace Part1ex.Controllers
         */
         //we first check that the information is provided first so hence the null , then add the user into the rolesdown list sue swith to send the user to the corrct dashbpard 
         //then we can make sure that the username and details that they entered are correct if not error messege appears
-        public IActionResult Login(string Email, string Password, string role = null)
+        public IActionResult Login(string Email, string Password)
         {
-            /*var user = RolesDown.Roles.FirstOrDefault(mem => mem.Email == Email && mem.Password == Password);
-        
-            if (user !=null)
+            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
+            {
+                TempData["LoginError"] = "Please enter email and password ";
+                return RedirectToAction("Index");
+            }
+
+            var user = RolesDown.Roles.FirstOrDefault(mem => mem.Email == Email && mem.Password == Password);
+
+            if (user != null)
             {
                 HttpContext.Session.SetString("UserRole", user.Role);
                 HttpContext.Session.SetString("UserName", user.Name);
@@ -60,9 +66,13 @@ namespace Part1ex.Controllers
                     _ => RedirectToAction("Dashboard")
                 };
             }
-            TempData["LoginError"] = "Invalid email or password ";
+            //if the user is not found
+            TempData["LoginError"] = "Invalid email or password";
             return RedirectToAction("Index");
-*/
+
+
+        }
+/*
             if (!string.IsNullOrEmpty(role))
             {
                 HttpContext.Session.SetString("UserRole", role);
@@ -80,37 +90,42 @@ namespace Part1ex.Controllers
             return RedirectToAction("Index");
 
         }
-
-
-        public IActionResult Register(string Name = null, string Email = null, string Password = null)
+*/
+        public IActionResult Register(string Name = null, string Email = null, string Password = null, string Role = null)
         {
             if (Request.Method == "POST") { //can be able to redirect to register 
 
-            TempData["SuccessMessage"] = "Registration Susccessful . please login";
-            return RedirectToAction("Index");
 
-
-                /* if (!string.IsNullOrEmpty(Name) &&
-                     !string.IsNullOrEmpty(Email) &&
-                     !string.IsNullOrEmpty(Password))
-                 {
-                )
-                HttpContext.Session.SetString("UserRole", Role);
-                HttpContext.Session.SetString("UserName", Name);
-
-                return Role switch
+                if (string.IsNullOrEmpty(Name) ||
+                     string.IsNullOrEmpty(Email) ||
+                     string.IsNullOrEmpty(Password))
                 {
-                    "Lecturer" => RedirectToAction("Dashboard"),
-                "Program Coordinator" => RedirectToAction("CoordinatorDashboard"),
-                "Program Manager" => RedirectToAction("ManagerDashboard"),
-                        _ => RedirectToAction("Dashboard")
-                    };
-                }
+                    TempData["RegisterError"] = "All fields are required.";
                     return View();
                 }
-                */
-            }
 
+                /*)
+                HttpContext.Session.SetString("UserRole", Role);
+                HttpContext.Session.SetString("UserName", Name);
+             
+                return Role switch
+                   */
+                if (RolesDown.Roles.Any(r => r.Email == Email))
+                {
+                    TempData["RegisterError"] = "Email is registered";
+                    return View();
+                }
+
+                RolesDown.Roles.Add(new Rol {
+                    Name = Name,
+                    Email = Email,
+                    Password = Password,
+                    Role = Role
+                });
+
+                TempData["SuccessMessage"] = "Registration successful . Login";
+                    return RedirectToAction("Index");
+                }
             return View();
         }
 
@@ -218,7 +233,7 @@ namespace Part1ex.Controllers
 
 
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
-            return View();
+            return View(HomeController.claimsList);
         }
 
         public IActionResult ManagerDashboard() {
@@ -235,45 +250,49 @@ namespace Part1ex.Controllers
             return View(verifiedClaims);
         }
 
-        public IActionResult ApproveClaim(int index)//this is for the coordinator
+
+
+
+        public IActionResult ApproveClaim(int claimid)//this is for the coordinator
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Program Coordinator")
                 return RedirectToAction("Index");
 
-            if (index >= 0 && index < claimsList.Count)
+            var claim = claimsList.FirstOrDefault(c => c.claimid == claimid);
+            if (claim != null)
             {
-                claimsList[index].ClaimStatus = "Verified";
-                TempData["Message"] = $"Claim {index + 1} Verified";
+                claim.ClaimStatus = "Verified";
+                TempData["Message"] = $"Claim{claim.claimid} Verified.";
             }
             return RedirectToAction("CoordinatorDashboard");
         }
-
-        public IActionResult RejectClaim(int index)//this is for the coordinator
+        public IActionResult RejectClaim(int claimid)//this is for the coordinator
         {
             var role = HttpContext.Session.GetString("UserRole");
-            if (role !="Program Coordinator")
+            if (role != "Program Coordinator")
                 return RedirectToAction("Index");
 
-            if (index >= 0 && index < claimsList.Count)
+            var claim = claimsList.FirstOrDefault(c => c.claimid == claimid);
+            if (claim != null)
             {
-                claimsList[index].ClaimStatus = "Denied";
-                TempData["Message"] = $"Claim {index + 1} Denied";
+                claim.ClaimStatus = "Denied";
+                TempData["Message"] = $"Claim {claim.claimid} Denied.";
             }
             return RedirectToAction("CoordinatorDashboard");
         }
-
-        public IActionResult ApproveClaimManager(int index)
+        public IActionResult ApproveClaimManager(int claimid)//this is used by the Manager
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Program Manager")
                 return RedirectToAction("Index");
 
             // Check for valid index and that the claim is Verified
-            if (index >= 0 && index < claimsList.Count && claimsList[index].ClaimStatus == "Verified")
+            var claim = claimsList.FirstOrDefault(c => c.claimid == claimid && c.ClaimStatus == "Verified");
+            if (claim != null)
             {
-                claimsList[index].ClaimStatus = "Approved";
-                TempData["Message"] = $"Claim {index + 1} Approved successfully.";
+                claim.ClaimStatus = "Approved";
+                TempData["Message"] = $"Claim {claim.claimid} Approved successfully.";
             }
             else
             {
@@ -283,17 +302,18 @@ namespace Part1ex.Controllers
             return RedirectToAction("ManagerDashboard");
         }
 
-        public IActionResult RejectClaimManager(int index)
+        public IActionResult RejectClaimManager(int claimid)//this is used by the Manager
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Program Manager")
                 return RedirectToAction("Index");
 
             // Check for valid index and that the claim is Verified
-            if (index >= 0 && index < claimsList.Count && claimsList[index].ClaimStatus == "Verified")
+            var claim = claimsList.FirstOrDefault(c => c.claimid == claimid && c.ClaimStatus == "Verified");
+            if (claim != null)
             {
-                claimsList[index].ClaimStatus = "Denied";
-                TempData["Message"] = $"Claim {index + 1} Denied successfully.";
+                claim.ClaimStatus = "Denied";
+                TempData["Message"] = $"Claim {claim.claimid} Denied successfully.";
             }
             else
             {

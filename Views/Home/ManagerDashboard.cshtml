@@ -21,15 +21,15 @@ else
 	<table >
 		<thead>
 		<tr>
-			<th>Claim id :</th>
-			<th>Lecturer name :</th>
-			<th>Hours Worked :</th>
-			<th>Hourly Rate :</th>
-			<th>Total Amount :</th>
-			<th>Documents :</th>
-			<th>Claim date :</th>
-			<th>Claim Status :</th>
-			<th>Actions :</th>
+			<th>Claim id </th>
+			<th>Lecturer name </th>
+			<th>Hours Worked </th>
+			<th>Hourly Rate </th>
+			<th>Total Amount </th>
+			<th>Documents </th>
+			<th>Claim date </th>
+			<th>Claim Status </th>
+			<th>Actions </th>
 		</tr>
 		</thead>
 		<tbody>
@@ -45,9 +45,9 @@ else
         <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
         <td><span class="badge @(claim.ClaimStatus.ToLower())">@claim.ClaimStatus</span></td>
         <td>
-            <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaimManager" , "Home", new {index = Model.IndexOf(claim)})">Approve</a>
+            <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaimManager" , "Home", new { claimid = claim.claimid})">Approve</a>
             <br />
-            <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaimManager" , "Home", new {index = Model.IndexOf(claim)})">Reject</a>
+            <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaimManager" , "Home", new { claimid = claim.claimid})">Reject</a>
         </td>
     </tr>
 }
