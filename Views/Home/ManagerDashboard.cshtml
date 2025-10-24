@@ -11,7 +11,7 @@
 	<h2 class="dashboard-heading">Verified claims awaiting approval :</H2>
 
 
-@if (Model == null || !Model.Any(c => c.ClaimStatus =="Verified"))
+@if (Model == null || !Model.Any(c => c.ClaimStatus =="Verified" || c.ClaimStatus == "Approved"))
 {
 	<div class="alert alert-info">No claims submitted yet.</div>
 

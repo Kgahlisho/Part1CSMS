@@ -28,29 +28,29 @@ else
 			<th>Total Amount </th>
 			<th>Documents </th>
 			<th>Claim date </th>
-			<th>Claim Status </th>
-			<th>Actions </th>
 			<th>Status </th>
+			<th>Actions </th>
+		
 		</tr>
 		</thead>
 		<tbody>
-		@for (int i = 0; i < Model.Count; i++)//to know each claims status in the index only the ones that show pending will show the approve and reject buttons
-
+		<!---
+			for (int i = 0; i < Model.Count; i++)//to know each claims status in the index only the ones that show pending will show the approve and reject buttons
+		--->
+		@foreach (var claim in Model)
 		{
-			var claim = Model[i];
+			var statusNormalized = (claim.ClaimStatus ?? "Pending").Trim().ToLower();
 			<tr>
 				<td>@claim.claimid</td>
 				<td>@claim.Lecturer</td>
 				<td>@claim.HoursWorked</td>
 				<td>@claim.HourlyRate</td>
 				<td>@claim.TotalAmount</td>
-				<td>@claim.DocumentsUploaded</td>
-				<td>@claim.ClaimDate</td>
-				<td>@claim.ClaimStatus</td>
-				<td>
-					<span class="badge @(claim.ClaimStatus.ToLower())">@claim.ClaimStatus</span>	</td>
+				<td>@(claim.DocumentsUploaded ?? "None")</td>
+				<td>@(claim.ClaimDate)</td>
+				<td><span class="badge"> @claim.ClaimStatus </span>	</td>
 					<td>
-					@if (claim.ClaimStatus == "Pending")
+					@if (statusNormalized == "pending")
 					{
 						<a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaim" , "Home", new { claimid = claim.claimid})">Verify</a>
 						<br />
