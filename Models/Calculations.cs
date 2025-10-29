@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Part1ex.Models
@@ -8,13 +9,15 @@ namespace Part1ex.Models
         [Key]
        public int claimid { get; set; }
         [Required]
+            [Column(TypeName = "decimal(18,2)")]
         public decimal HoursWorked { get; set; }
 
 
         [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal HourlyRate { get; set; }
 
-
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
         //expended to include the datetime documents claimstatus

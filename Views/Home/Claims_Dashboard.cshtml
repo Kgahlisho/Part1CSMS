@@ -34,7 +34,7 @@
 <tr>
 	<td>@(i+1)</td><!--claim number increases by one-->
 	<td>@Model[i].claimid</td>
-				<td>@Model[i].TotalAmount.ToString("R")</td>
+				<td>@Model[i].TotalAmount.ToString("0.00")</td>
 				<td>@Model[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 				<td>@(Model[i].DocumentsUploaded ?? "None")</td> <!--We disply none if nothing has been submitted-->
 						<td>

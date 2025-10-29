@@ -163,7 +163,7 @@ namespace Part1ex.Controllers
 
             if (TempData.ContainsKey("TotalAmount"))
             {
-                model.TotalAmount = Convert.ToDecimal(TempData["TotalAmount"]);
+                model.TotalAmount = decimal.Parse(TempData["TotalAmount"].ToString());
             }
 
             if (TempData.ContainsKey("UploadMessage"))
@@ -218,7 +218,7 @@ namespace Part1ex.Controllers
                 TempData["UploadMessage"] = model.DocumentsUploaded != null
                   ? $"File'{uploadFile.FileName}' uploaded successfully." : "No file uploaded";
 
-                TempData["TotalAmount"] = model.TotalAmount;
+                TempData["TotalAmount"] = model.TotalAmount.ToString();
 
                 return RedirectToAction("Claims");
             }
