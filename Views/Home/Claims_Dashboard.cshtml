@@ -5,58 +5,137 @@
 <div style="margin-top: 1.5rem;">
 	<a class="btn btn-primary" href="@Url.Action("Dashboard", "Home")">Back to Dashboard</a>
 </div>
+	
+
 	<div class="container">
-
-
 	<br />
 
-<h1 class="dashboard-heading">Welcome to your Claims</h1>
-
+	<h1 class="dashboard-heading">Welcome to your Claims</h1>
 	<h2 class="dashboard-heading">Total claims made Below: @(Model?.Count ?? 0)</h2>
 
 @if (Model != null && Model.Any())
 {
-<table >
-	<thead>
-<tr>
-	<th>Claim id </th>
-	<th>Claim </th>
-	<th>Total claim </th>
-	<th>Claim date </th>
-	<th>Documents Uploaded </th>
-	<th>Claim status </th>
-</tr>
-	</thead>
 
-<tbody>
-	@for(int i = 0 ; i < Model.Count; i++){<!--We make sure that every new claim they are incremented by one using the for loop-->
+	var pendingClaims = Model.Where(c => c.ClaimStatus == "Pending").ToList();
+	var approvedClaims = Model.Where(c => c.ClaimStatus == "Approved").ToList();
+	var deniedClaims = Model.Where(c => c.ClaimStatus == "Denied").ToList();
 
-<tr>
-	<td>@(i+1)</td><!--claim number increases by one-->
-	<td>@Model[i].claimid</td>
-				<td>@Model[i].TotalAmount.ToString("0.00")</td>
-				<td>@Model[i].ClaimDate.ToString("yyyy-MM-dd")</td>
-				<td>@(Model[i].DocumentsUploaded ?? "None")</td> <!--We disply none if nothing has been submitted-->
-						<td>
-							<span class="badge @(Model[i].ClaimStatus?.ToLower()?? "pending")">
-								@Model[i].ClaimStatus</span>
-						</td>
-</tr>
-	}
+	<!--new claims-->
+	<h3> Pending / new claims (@pendingClaims.Count)</h3>
+	@if (pendingClaims.Any())
+		{
+		 <table class="table">
+			 <thead>
+				 <tr>
+					 <th>#</th>
+						<th>Claim id</th>
+						<th>Total Amount</th>
+						<th>Date</th>
+						<th>Documents</th>
+						<th>Status</th>
+				 </tr>
+			 </thead>
+			 <tbody>
+					@for (int i = 0; i < pendingClaims.Count; i++)
+					{
+						<tr>
+							<td>@(i + 1)</td>
+							<td>@pendingClaims[i].claimid</td>
+							<td>@pendingClaims[i].TotalAmount.ToString("0.00")</td>
+							<td>@pendingClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
+							<td>@(pendingClaims[i].DocumentsUploaded ?? "None")</td>
+							<td><span class="badge badge-warning">@pendingClaims[i].ClaimStatus</span></td>
+						</tr>
+					}
+			 </tbody>
+			</table>
+		}else
+		{
+			<p class="alert alert-info">No pending claims.</p>
+		}
 
-</tbody>
+		<br />
 
-</table>
 
+		<!--Approved claims-->
+		<h3>Approved Claims (@approvedClaims.Count)</h3>
+		@if (approvedClaims.Any())
+		{
+			<table class="table table-success">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Claim ID</th>
+						<th>Total Amount</th>
+						<th>Date</th>
+						<th>Documents</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (int i = 0; i < approvedClaims.Count; i++)
+					{
+						<tr>
+							<td>@(i + 1)</td>
+							<td>@approvedClaims[i].claimid</td>
+							<td>@approvedClaims[i].TotalAmount.ToString("0.00")</td>
+							<td>@approvedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
+							<td>@(approvedClaims[i].DocumentsUploaded ?? "None")</td>
+							<td><span class="badge badge-success">@approvedClaims[i].ClaimStatus</span></td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		else
+		{
+			<p class="älert alert-info">No approved claims.</p>
+		}
+
+		<br />
+
+		<!-- Denied Claims -->
+		<h3>Denied Claims (@deniedClaims.Count)</h3>
+		@if (deniedClaims.Any())
+		{
+			<table class="table table-danger">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Claim ID</th>
+						<th>Total Amount</th>
+						<th>Date</th>
+						<th>Documents</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (int i = 0; i < deniedClaims.Count; i++)
+					{
+						<tr>
+							<td>@(i + 1)</td>
+							<td>@deniedClaims[i].claimid</td>
+							<td>@deniedClaims[i].TotalAmount.ToString("0.00")</td>
+							<td>@deniedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
+							<td>@(deniedClaims[i].DocumentsUploaded ?? "None")</td>
+							<td><span class="badge badge-danger">@deniedClaims[i].ClaimStatus</span></td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		else
+		{
+			<p class="alert alert-info"> No denied claims.</p>
+		}
 
 		<div style="margin-top: 1.5rem;" class="buttons">
 			<a class="btn btn-success" href="@Url.Action("Claims", "Home")">Submit a New Claim</a>
-			</div>
-}
+		</div>
 
-else
-{<p class="alert alert-info">No claim made yet</p>}
-
-
-
-</div>
+	}
+	else
+	{
+		<p class ="alert alert-info">No claims made yet.</p>
+	}
+	</div>

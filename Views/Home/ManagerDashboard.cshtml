@@ -11,54 +11,104 @@
 	<h2 class="dashboard-heading">Verified claims awaiting approval :</H2>
 
 
-@if (Model == null || !Model.Any(c => c.ClaimStatus =="Verified" || c.ClaimStatus == "Approved"))
+@if (Model == null || !Model.Any(c => c.ClaimStatus =="Verified"))
 {
-	<div class="alert alert-info">No claims submitted yet.</div>
+	<div class="alert alert-info">No claims awaiting approval have been submitted yet.</div>
 
 }
 else
 {
-	<table >
-		<thead>
-		<tr>
-			<th>Claim id </th>
-			<th>Lecturer name </th>
-			<th>Hours Worked </th>
-			<th>Hourly Rate </th>
-			<th>Total Amount </th>
-			<th>Documents </th>
-			<th>Claim date </th>
-			<th>Claim Status </th>
-			<th>Actions </th>
-		</tr>
-		</thead>
-		<tbody>
-		@foreach (var claim in Model.Where(c => c.ClaimStatus == "Verified"))
-{
-    <tr>
-		<td>@claim.claimid</td>
-        <td>@claim.Lecturer</td>
-        <td>@claim.HoursWorked</td>
-        <td>@claim.HourlyRate</td>
-        <td>@claim.TotalAmount</td>
-        <td>@claim.DocumentsUploaded</td>
-        <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-        <td><span class="badge @(claim.ClaimStatus.ToLower())">@claim.ClaimStatus</span></td>
-        <td>
-            <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaimManager" , "Home", new { claimid = claim.claimid})">Approve</a>
-            <br />
-            <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaimManager" , "Home", new { claimid = claim.claimid})">Reject</a>
-        </td>
-    </tr>
+	<table class="table table-warning">
+        <thead>
+            <tr>
+                <th>Claim id</th>
+                <th>Lecturer name</th>
+                <th>Hours Worked</th>
+                <th>Hourly Rate</th>
+                <th>Total Amount</th>
+                <th>Documents</th>
+                <th>Claim date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var claim in Model.Where(c => c.ClaimStatus == "Verified"))
+        {
+            <tr>
+                <td>@claim.claimid</td>
+                <td>@claim.Lecturer</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.HourlyRate</td>
+                <td>@claim.TotalAmount</td>
+                <td>@(claim.DocumentsUploaded ?? "None")</td>
+                <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                <td><span class="badge badge-info">@claim.ClaimStatus</span></td>
+                <td>
+                    <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaimManager", "Home", new { claimid = claim.claimid })">Approve</a>
+                    <br />
+                    <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaimManager", "Home", new { claimid = claim.claimid })">Reject</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
 }
-		</tbody>
+
+<br/>
 
 
 
-	</table>
+ <h2 class="dashboard-heading">Processed claims (Approved / Denied):</h2>
+
+@if (Model == null || !Model.Any(c => c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied"))
+{
+    <div class="alert alert-info">No processed claims yet.</div>
+}
+else
+{
+    <table class="table table-secondary">
+        <thead>
+            <tr>
+                <th>Claim id</th>
+                <th>Lecturer name</th>
+                <th>Hours Worked</th>
+                <th>Hourly Rate</th>
+                <th>Total Amount</th>
+                <th>Documents</th>
+                <th>Claim date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var claim in Model.Where(c => c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied"))
+        {
+            <tr>
+                <td>@claim.claimid</td>
+                <td>@claim.Lecturer</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.HourlyRate</td>
+                <td>@claim.TotalAmount</td>
+                <td>@(claim.DocumentsUploaded ?? "None")</td>
+                <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <span class="badge @(claim.ClaimStatus == "Approved" ? "badge-success" : "badge-danger")">
+                        @claim.ClaimStatus
+                    </span>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+                
+
+
 	@if (TempData["Message"] != null)
     {
         <p style="color:green">@TempData["Message"]</p>
     }
 }
 </div>
+
