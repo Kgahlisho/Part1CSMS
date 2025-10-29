@@ -304,9 +304,10 @@ namespace Part1ex.Controllers
                 return RedirectToAction("Dashboard");
 
 
+
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
             var verifiedClaims = await _dbContext.Claims
-                .Where(c => c.ClaimStatus == "Verified" || c.ClaimStatus == "Approved").ToListAsync();
+                .Where(c => c.ClaimStatus == "Verified" || c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied").ToListAsync();
             
             return View(verifiedClaims);
         }

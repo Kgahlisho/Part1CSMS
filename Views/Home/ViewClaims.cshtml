@@ -45,8 +45,8 @@
                             <td>@claim.claimid</td>
                             <td>@claim.Lecturer</td>
                             <td>@claim.HoursWorked</td>
-                            <td>@claim.HourlyRate</td>
-                            <td>@claim.TotalAmount</td>
+                            <td>R @claim.HourlyRate</td>
+                            <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                             <td><span class="badge badge-warning">@claim.ClaimStatus</span></td>
@@ -91,8 +91,8 @@
                             <td>@claim.claimid</td>
                             <td>@claim.Lecturer</td>
                             <td>@claim.HoursWorked</td>
-                            <td>@claim.HourlyRate</td>
-                            <td>@claim.TotalAmount</td>
+                            <td>R @claim.HourlyRate</td>
+                            <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                             <td><span class="badge badge-info">@claim.ClaimStatus</span></td>
@@ -111,7 +111,7 @@
     <h3>Approved Claims (@approvedClaims.Count)</h3>
     @if (approvedClaims.Any())
     {
-        <table class="table table-primary">
+        <table class="table table-success">
             <thead>
                 <tr>
                     <th>Claim ID</th>
@@ -132,8 +132,8 @@
                         <td>@claim.claimid</td>
                         <td>@claim.Lecturer</td>
                         <td>@claim.HoursWorked</td>
-                        <td>@claim.HourlyRate</td>
-                        <td>@claim.TotalAmount</td>
+                        <td>R @claim.HourlyRate</td>
+                        <td>R @claim.TotalAmount</td>
                         <td>@(claim.DocumentsUploaded ?? "None")</td>
                         <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                         <td><span class="badge badge-primary">@claim.ClaimStatus</span></td>
@@ -175,8 +175,8 @@
                             <td>@claim.claimid</td>
                             <td>@claim.Lecturer</td>
                             <td>@claim.HoursWorked</td>
-                            <td>@claim.HourlyRate</td>
-                            <td>@claim.TotalAmount</td>
+                            <td>R @claim.HourlyRate</td>
+                            <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                             <td><span class="badge badge-danger">@claim.ClaimStatus</span></td>

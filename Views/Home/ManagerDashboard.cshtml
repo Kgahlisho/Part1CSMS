@@ -4,7 +4,7 @@
 
     <a class="btn btn-primary" href="@Url.Action("ManagerDashboard","Home")"> Back to Dashboard</a>
 
-<div class="container">
+<div class="container mt-4">
 
 
 <br />
@@ -39,8 +39,8 @@ else
                 <td>@claim.claimid</td>
                 <td>@claim.Lecturer</td>
                 <td>@claim.HoursWorked</td>
-                <td>@claim.HourlyRate</td>
-                <td>@claim.TotalAmount</td>
+                <td>R @claim.HourlyRate</td>
+                <td>R @claim.TotalAmount</td>
                 <td>@(claim.DocumentsUploaded ?? "None")</td>
                 <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                 <td><span class="badge badge-info">@claim.ClaimStatus</span></td>
@@ -87,8 +87,8 @@ else
                 <td>@claim.claimid</td>
                 <td>@claim.Lecturer</td>
                 <td>@claim.HoursWorked</td>
-                <td>@claim.HourlyRate</td>
-                <td>@claim.TotalAmount</td>
+                <td>R @claim.HourlyRate</td>
+                <td>R @claim.TotalAmount</td>
                 <td>@(claim.DocumentsUploaded ?? "None")</td>
                 <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                 <td>
@@ -101,7 +101,39 @@ else
         </tbody>
     </table>
 }
-
+<h2 class="dashboard-heading">Denied Claims</h2>
+    @if (Model == null || !Model.Any(c => c.ClaimStatus == "Denied"))
+    {
+        <div class="alert alert-info">No denied claims yet.</div>
+    }
+    else
+    {
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Lecturer</th>
+                    <th>Total Amount</th>
+                    <th>Documents</th>
+                    <th>Claim Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.Where(c => c.ClaimStatus == "Denied"))
+                {
+                    <tr>
+                        <td>@claim.claimid</td>
+                        <td>@claim.Lecturer</td>
+                        <td>R @claim.TotalAmount</td>
+                        <td>@claim.DocumentsUploaded</td>
+                        <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                        <td><span class="badge bg-danger">@claim.ClaimStatus</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
                 
 
 

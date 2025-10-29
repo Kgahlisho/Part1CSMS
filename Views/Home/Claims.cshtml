@@ -1,6 +1,7 @@
 ﻿@model Part1ex.Models.Calculations
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <div class="buttons" style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
@@ -18,15 +19,15 @@
 <!--here we make sure that the data entered by the user is entered into the following inputs-->
 
 
-<form asp-action="Claims" asp-controller="Home" method="post" enctype="multipart/form-data">
-	<div asp-validation-summary="ModelOnly"></div>
+	<form id="claimForm" asp-action="Claims" asp-controller="Home" method="post" enctype="multipart/form-data">
+<div asp-validation-summary="ModelOnly"></div>
 	<label>
-		Enter Hours Worked : <input type="number" asp-for="HoursWorked" name="HoursWorked"   placeholder="Enter Hours Worked" required />
+		Enter Hours Worked : <input type="number" asp-for="HoursWorked" name="HoursWorked"   placeholder="Enter Hours Worked" id="HoursWorked" required />
 		</label>
 
 	<br />
 <label>
-			Enter Hourly Rate : <input type="number" asp-for="HourlyRate" name="HourlyRate" placeholder="Enter Hourly Rate" required />
+			Enter Hourly Rate : <input type="number" asp-for="HourlyRate" name="HourlyRate" placeholder="Enter Hourly Rate" id="HourlyRate" required />
 	</label>
 
 	<br />
@@ -50,7 +51,7 @@
 				<div class="alert alert-success">@ViewBag.UploadMessage </div>
 	}
 
-	@if (ViewBag.CliamError != null)
+	@if (ViewBag.ClaimError != null)
 		{
 			<div class="alert alert-danger"> @ViewBag.ClaimError</div>
 		}
@@ -75,7 +76,45 @@
 	
 
 </form>
+
+
 @section Scripts{
+		<script>
+
+			document.getElementById("claimForm").addEventListener("submit", function(event) {
+				event.preventDefault(); // stop form submission
+
+							const hours = parseFloat(document.getElementById("HoursWorked").value);
+				const rate = parseFloat(document.getElementById("HourlyRate").value);
+				const total = (hours * rate).toFixed(2);
+
+				if (isNaN(hours) || isNaN(rate) || hours <= 0 || rate <= 0) {
+					Swal.fire("Invalid Input", "Please enter valid Numbers for the Hours Worked that you worked and the Hourly Rate you are paid .", "error");
+					return;
+				}
+
+				Swal.fire({
+					title: "Confirm Your Claim",
+					html: `
+						<p>Please confirm the following details:</p>
+						<p><strong>Hours Worked:</strong> ${hours}</p>
+						<p><strong>Hourly Rate:</strong> R${rate.toFixed(2)}</p>
+						<p><strong>Total Amount:</strong> R${total}</p>
+							`,
+					icon: "info",
+					showCancelButton: true,
+					confirmButtonText: "Confirm",
+					cancelButtonText: "Cancel"
+				}).then((result) => {
+					if (result.isConfirmed) {
+						this.submit();
+					} else {
+						Swal.fire("Cancelled", "Please review your claim before submitting.", "info");
+					}
+				});
+			});
+		</script>
+
 	<partial name="_ValidationScriptsPartial"/>
 }
 

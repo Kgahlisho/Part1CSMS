@@ -41,7 +41,7 @@
 						<tr>
 							<td>@(i + 1)</td>
 							<td>@pendingClaims[i].claimid</td>
-							<td>@pendingClaims[i].TotalAmount.ToString("0.00")</td>
+							<td>R @pendingClaims[i].TotalAmount.ToString("0.00")</td>
 							<td>@pendingClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(pendingClaims[i].DocumentsUploaded ?? "None")</td>
 							<td><span class="badge badge-warning">@pendingClaims[i].ClaimStatus</span></td>
@@ -78,7 +78,7 @@
 						<tr>
 							<td>@(i + 1)</td>
 							<td>@approvedClaims[i].claimid</td>
-							<td>@approvedClaims[i].TotalAmount.ToString("0.00")</td>
+							<td>R @approvedClaims[i].TotalAmount.ToString("0.00")</td>
 							<td>@approvedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(approvedClaims[i].DocumentsUploaded ?? "None")</td>
 							<td><span class="badge badge-success">@approvedClaims[i].ClaimStatus</span></td>
@@ -115,7 +115,7 @@
 						<tr>
 							<td>@(i + 1)</td>
 							<td>@deniedClaims[i].claimid</td>
-							<td>@deniedClaims[i].TotalAmount.ToString("0.00")</td>
+							<td>R @deniedClaims[i].TotalAmount.ToString("0.00")</td>
 							<td>@deniedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(deniedClaims[i].DocumentsUploaded ?? "None")</td>
 							<td><span class="badge badge-danger">@deniedClaims[i].ClaimStatus</span></td>
