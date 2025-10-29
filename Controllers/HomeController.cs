@@ -158,20 +158,41 @@ namespace Part1ex.Controllers
 
         [HttpGet]
         public IActionResult Claims()
-        { 
-            return View(new Calculations());
+        {
+            var model = new Calculations();
+
+            if (TempData.ContainsKey("TotalAmount"))
+            {
+                model.TotalAmount = Convert.ToDecimal(TempData["TotalAmount"]);
+            }
+
+            if (TempData.ContainsKey("UploadMessage"))
+            {
+                ViewBag.UploadMessage = TempData["UploadMessage"];
+            }
+
+            if (TempData.ContainsKey("ClaimError"))
+            {
+                ViewBag.ClaimError = TempData["ClaimError"];
+            }
+
+            return View(model);
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Claims(Calculations model, IFormFile? uploadFile)
         {
-            if (model == null)
+            if (model == null || model.HoursWorked <= 0 || model.HourlyRate <=0)
             //|| !ModelState.IsValid || model.HoursWorked <= 0 || model.HourlyRate <= 0)
             {
                 TempData["ClaimError"] = "Please ensure all fields are valid and positive values are entered.";
                 return View(new Calculations());
 
             }
+
+
             model.TotalAmount = model.HoursWorked * model.HourlyRate;
             model.ClaimDate = DateTime.Now;
             model.ClaimStatus = "Pending";
@@ -193,15 +214,20 @@ namespace Part1ex.Controllers
                 await _dbContext.SaveChangesAsync();
 
 
+
                 TempData["UploadMessage"] = model.DocumentsUploaded != null
                   ? $"File'{uploadFile.FileName}' uploaded successfully." : "No file uploaded";
-            return RedirectToAction("Claims");
+
+                TempData["TotalAmount"] = model.TotalAmount;
+
+                return RedirectToAction("Claims");
             }
             catch (Exception ex)
             {
                 TempData["ClaimError"] = $"Error saving claim:{ex.Message}";
                 return View(model);
             }
+
         }
          //      
            // }

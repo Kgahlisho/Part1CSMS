@@ -37,12 +37,21 @@
 	</div>
 
 	<br />
+	@if (ViewBag.UploadMessage != null)
+		{
+				<div class="alert alert-success">@ViewBag.UploadMessage </div>
+	}
+
+	@if (ViewBag.CliamError != null)
+		{
+			<div class="alert alert-danger"> @ViewBag.ClaimError</div>
+		}
 
 	<div class="Totalclaims">
 	@if (Model !=null && Model.TotalAmount>0)
 
 	{
-		<h3 class="run">Your total claim is : R @Model.TotalAmount</h3>
+		<h3 class="run"> Your total claim is: @Model.TotalAmount</h3>
 	}
 		</div>
 

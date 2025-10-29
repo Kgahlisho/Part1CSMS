@@ -8,14 +8,14 @@ namespace Part1ex.Models
         [Key]
        public int claimid { get; set; }
         [Required]
-        public int HoursWorked { get; set; }
+        public decimal HoursWorked { get; set; }
 
 
         [Required]
-        public int HourlyRate { get; set; }
+        public decimal HourlyRate { get; set; }
 
 
-        public int TotalAmount { get; set; }
+        public decimal TotalAmount { get; set; }
 
         //expended to include the datetime documents claimstatus
         public DateTime ClaimDate { get; set; } = DateTime.Now;
