@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Part1ex.Data;
 //using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
+using System.Data.Entity.Core.Mapping;
 
 
 
@@ -229,9 +231,9 @@ namespace Part1ex.Controllers
             }
 
         }
-         //      
-           // }
-           
+        //      
+        // }
+
 
         //This is the claims action method to navigae to the claims and the claims dashboard
         /*
@@ -252,6 +254,79 @@ namespace Part1ex.Controllers
             return View(model);
         }
         */
+
+        [HttpGet] //the user will be able to edit there claim using this get - post
+        public async Task<IActionResult> EditClaim(int id)
+        {
+            var claim = await _dbContext.Claims.FindAsync(id);
+            if (claim == null)
+            {
+                TempData["ClaimError"] = "Claim not found";
+                return RedirectToAction("Claims_Dashboard");
+            }
+                if(claim.ClaimStatus != "Pending")
+                {
+                    TempData["ClaimError"] = "Only pending claims can be edited.";
+                    return RedirectToAction("Claims_Dashboard");
+                }
+                return View(claim);
+            }
+        
+
+        [HttpPost]
+        public async Task<IActionResult> EditClaimAjax(int id ,decimal hoursWorked , decimal hourlyRate, IFormFile? newDocument)
+        {
+            var claim = await _dbContext.Claims.FindAsync(id);
+            if (claim == null)
+                return Json(new { success = false, message = "Claim not found." });
+
+            if (claim.ClaimStatus != "Pending")
+                return Json(new { success = false, message = "Only pending claims can be edited." });
+
+            claim.HoursWorked = hoursWorked;
+            claim.HourlyRate = hourlyRate;
+            claim.TotalAmount = hoursWorked * hourlyRate;
+            claim.ClaimDate = DateTime.Now;
+
+            //Handle optional new document upload
+            if (newDocument != null && newDocument.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                var filePath = Path.Combine(uploadsFolder, newDocument.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await newDocument.CopyToAsync(stream);
+                }
+                claim.DocumentsUploaded = "/uploads/" + newDocument.FileName;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return Json(new { success = true, message = $"Claim #{claim.claimid} updated successfully." });
+        }
+
+
+        //DELETE Claim
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteClaim([FromBody]int id)
+        {
+            var claim = await _dbContext.Claims.FindAsync(id);
+            if (claim == null)
+                return Json(new { success = false, message = "claim not found." });
+
+
+            if (claim.ClaimStatus != "Pending")
+                return Json(new { success = false, message = "Only pending claims can be deleted." });
+
+
+            _dbContext.Claims.Remove(claim);
+            await _dbContext.SaveChangesAsync();
+            return Json(new { success = true, message = $"claim #{id} deleted successfully." });
+        }
+
 
         public async Task<IActionResult> Claims_Dashboard()//now it feathces from EF 
         {

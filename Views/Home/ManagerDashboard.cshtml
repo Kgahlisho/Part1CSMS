@@ -63,26 +63,26 @@ else
 
 @if (Model == null || !Model.Any(c => c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied"))
 {
-    <div class="alert alert-info">No processed claims yet.</div>
-}
-else
-{
-    <table class="table table-secondary">
-        <thead>
-            <tr>
-                <th>Claim id</th>
-                <th>Lecturer name</th>
-                <th>Hours Worked</th>
-                <th>Hourly Rate</th>
-                <th>Total Amount</th>
-                <th>Documents</th>
-                <th>Claim date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var claim in Model.Where(c => c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied"))
-        {
+        <div class="alert alert-info">No processed claims yet.</div>
+    }
+    else
+    {
+        <table class="table table-secondary">
+            <thead>
+                <tr>
+                    <th>Claim id</th>
+                    <th>Lecturer name</th>
+                    <th>Hours Worked</th>
+                    <th>Hourly Rate</th>
+                    <th>Total Amount</th>
+                    <th>Documents</th>
+                    <th>Claim date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.Where(c => c.ClaimStatus == "Approved")) 
+                {
             <tr>
                 <td>@claim.claimid</td>
                 <td>@claim.Lecturer</td>

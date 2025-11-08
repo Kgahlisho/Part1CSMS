@@ -45,7 +45,22 @@
 							<td>@pendingClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(pendingClaims[i].DocumentsUploaded ?? "None")</td>
 							<td><span class="badge badge-warning">@pendingClaims[i].ClaimStatus</span></td>
+							<td>
+								<button class="btn btn-warning btn-sm edit-claim-btn"
+										data-id="@pendingClaims[i].claimid"
+										data-hours="@pendingClaims[i].HoursWorked"
+										data-rate="@pendingClaims[i].HourlyRate"
+										data-doc="@pendingClaims[i].DocumentsUploaded">
+									Edit
+								</button>
+								<button class="btn btn-danger btn-sm delete-claim-btn"
+										data-id="@pendingClaims[i].claimid">
+									Delete
+									</button>
+							</td>
+
 						</tr>
+
 					}
 			 </tbody>
 			</table>
@@ -82,6 +97,8 @@
 							<td>@approvedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(approvedClaims[i].DocumentsUploaded ?? "None")</td>
 							<td><span class="badge badge-success">@approvedClaims[i].ClaimStatus</span></td>
+							
+
 						</tr>
 					}
 				</tbody>
@@ -139,3 +156,171 @@
 		<p class ="alert alert-info">No claims made yet.</p>
 	}
 	</div>
+
+<!-- Edit Claim -->
+<div class="modal fade" id="editClaimModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header bg-warning text-dark">
+				<h5 class="modal-title">Edit Claim</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editClaimForm" enctype="multipart/form-data">
+					<!-- claimid Read-only visibile-->
+					<label class="form-label">Claim ID</label>
+					<input type="text" class="form-control" id="editClaimIdDisplay" readonly />
+					<input type="hidden" id="editClaimId" name="id" />
+
+					<div class="mb-3">
+						<label class="form-label">Hours Worked</label>
+						<input type="number" step="0.01" class="form-control" id="editHoursWorked" name="hoursWorked" required />
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Hourly Rate</label>
+						<input type="number" step="0.01" class="form-control" id="editHourlyRate" name="hourlyRate" required />
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Upload New Document (optional)</label>
+						<input type="file" class="form-control" id="editDocument" name="newDocument" />
+					</div>
+
+					<div class="text-end">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-success">Confirm Changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const editButtons = document.querySelectorAll(".edit-claim-btn");
+
+			editButtons.forEach(btn => {
+				btn.addEventListener("click", function () {
+					const claimId = this.dataset.id;
+					const hours = this.dataset.hours;
+					const rate = this.dataset.rate;
+
+					// Fill modal fields
+					document.getElementById("editClaimId").value = claimId;
+					document.getElementById("editClaimIdDisplay").value = claimId;
+					document.getElementById("editHoursWorked").value = hours;
+					document.getElementById("editHourlyRate").value = rate;
+
+					// Show modal popup
+					const modal = new bootstrap.Modal(document.getElementById("editClaimModal"));
+					modal.show();
+				});
+			});
+
+			// Handle form submission with SweetAlert popups
+			document.getElementById("editClaimForm").addEventListener("submit", async function (e) {
+				e.preventDefault();
+
+				const formData = new FormData(this);
+				const claimId = document.getElementById("editClaimId").value;
+				const hours = document.getElementById("editHoursWorked").value;
+				const rate = document.getElementById("editHourlyRate").value;
+
+				// Confirmation popup before applying changes
+				const result = await Swal.fire({
+					title: "Confirm Changes",
+					html: `
+						<p>You're about to update claim <strong>#${claimId}</strong>.</p>
+						<p><strong>Hours Worked:</strong> ${hours}</p>
+						<p><strong>Hourly Rate:</strong> R${rate}</p>
+						<p>Do you want to proceed?</p>
+					`,
+					icon: "warning",
+					showCancelButton: true,
+					confirmButtonText: "Yes, Save Changes",
+					cancelButtonText: "Cancel",
+					reverseButtons: true
+				});
+
+				if (!result.isConfirmed) return;
+
+				try {
+					const response = await fetch('/Home/EditClaimAjax', {
+						method: 'POST',
+						body: formData
+					});
+					const data = await response.json();
+
+					if (data.success) {
+						await Swal.fire({
+							title: "Changes Saved!",
+							text: data.message,
+							icon: "success",
+							confirmButtonText: "OK"
+						});
+						location.reload(); // refresh to show updated claim
+					} else {
+						Swal.fire("Error", data.message, "error");
+					}
+				} catch (err) {
+					Swal.fire("Error", "Something went wrong while updating the claim.", "error");
+				}
+			});
+		});
+	
+// Handle Delete Claim
+const deleteButtons = document.querySelectorAll(".delete-claim-btn");
+
+deleteButtons.forEach(btn => {
+    btn.addEventListener("click", async function () {
+        const claimId = this.dataset.id;
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: `You are about to delete claim #${claimId}. This action cannot be undone!`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Delete",
+            cancelButtonText: "Cancel",
+            reverseButtons: true
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await fetch('/Home/DeleteClaim', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                body: JSON.stringify({ id: claimId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    title: "Deleted!",
+                    text: `Claim #${claimId} has been deleted successfully.`,
+                    icon: "success",
+                    confirmButtonText: "OK"
+                });
+                location.reload();
+            } else {
+                Swal.fire("Error", data.message, "error");
+            }
+        } catch (err) {
+            Swal.fire("Error", "Something went wrong while deleting the claim.", "error");
+        }
+    });
+});
+
+	</script>
+}
