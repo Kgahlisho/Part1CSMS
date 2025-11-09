@@ -23,6 +23,7 @@ else
             <tr>
                 <th>Claim id</th>
                 <th>Lecturer name</th>
+                <th>Verified By</th>
                 <th>Hours Worked</th>
                 <th>Hourly Rate</th>
                 <th>Total Amount</th>
@@ -38,6 +39,7 @@ else
             <tr>
                 <td>@claim.claimid</td>
                 <td>@claim.Lecturer</td>
+                <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
                 <td>@claim.HoursWorked</td>
                 <td>R @claim.HourlyRate</td>
                 <td>R @claim.TotalAmount</td>
@@ -48,7 +50,7 @@ else
                     <button class="btn btn-success btn-sm approve-claim-btn" data-claimid="@claim.claimid">
                         Approve
                     </button>
-                    <button class="btn btn-danger btn-sm reject-claim-btn" data-claimid="@claim.claimid">
+                     <button class="btn btn-danger btn-sm reject-claim-btn" data-claimid="@claim.claimid">
                         Reject
                     </button>
                 </td>
@@ -73,32 +75,34 @@ else
         <table class="table table-secondary">
             <thead>
                 <tr>
-                    <th>Claim id</th>
-                    <th>Lecturer name</th>
-                    <th>Hours Worked</th>
-                    <th>Hourly Rate</th>
-                    <th>Total Amount</th>
-                    <th>Documents</th>
-                    <th>Claim date</th>
-                    <th>Status</th>
+                   <th>Claim ID</th>
+                <th>Lecturer</th>
+                <th>Verified By</th>
+                <th>Hours Worked</th>
+                <th>Hourly Rate</th>
+                <th>Total Amount</th>
+                <th>Documents</th>
+                <th>Claim Date</th>
+                <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var claim in Model.Where(c => c.ClaimStatus == "Approved")) 
                 {
             <tr>
-                <td>@claim.claimid</td>
-                <td>@claim.Lecturer</td>
-                <td>@claim.HoursWorked</td>
-                <td>R @claim.HourlyRate</td>
-                <td>R @claim.TotalAmount</td>
-                <td>@(claim.DocumentsUploaded ?? "None")</td>
-                <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <span class="badge @(claim.ClaimStatus == "Approved" ? "badge-success" : "badge-danger")">
-                        @claim.ClaimStatus
-                    </span>
-                </td>
+               <td>@claim.claimid</td>
+                    <td>@claim.Lecturer</td>
+                         <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
+                    <td>@claim.HoursWorked</td>
+                    <td>R @claim.HourlyRate</td>
+                    <td>R @claim.TotalAmount</td>
+                    <td>@(claim.DocumentsUploaded ?? "None")</td>
+                    <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <span class="badge @(claim.ClaimStatus == "Approved" ? "badge-success" : "badge-danger")">
+                            @claim.ClaimStatus
+                        </span>
+                    </td>
             </tr>
         }
         </tbody>
@@ -116,6 +120,7 @@ else
                 <tr>
                     <th>Claim ID</th>
                     <th>Lecturer</th>
+                    <th>Verified By</th>
                     <th>Total Amount</th>
                     <th>Documents</th>
                     <th>Claim Date</th>
@@ -127,11 +132,12 @@ else
                 {
                     <tr>
                         <td>@claim.claimid</td>
-                        <td>@claim.Lecturer</td>
-                        <td>R @claim.TotalAmount</td>
-                        <td>@claim.DocumentsUploaded</td>
-                        <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                        <td><span class="badge bg-danger">@claim.ClaimStatus</span></td>
+                    <td>@claim.Lecturer</td>
+                    <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
+                    <td>R @claim.TotalAmount</td>
+                    <td>@(claim.DocumentsUploaded ?? "None")</td>
+                    <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                    <td><span class="badge bg-danger">@claim.ClaimStatus</span></td>
                     </tr>
                 }
             </tbody>

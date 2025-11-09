@@ -385,8 +385,21 @@ namespace Part1ex.Controllers
 
 
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
+
             var verifiedClaims = await _dbContext.Claims
-                .Where(c => c.ClaimStatus == "Verified" || c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied").ToListAsync();
+               .Where(c => c.ClaimStatus == "Verified" || c.ClaimStatus == "Approved" || c.ClaimStatus == "Denied")
+        .Select(c => new Calculations
+        {
+            claimid = c.claimid,
+            Lecturer = c.Lecturer ?? "Unknown",
+            VerifiedBy = c.VerifiedBy ?? "-",
+            HoursWorked = c.HoursWorked,
+            HourlyRate = c.HourlyRate,
+            TotalAmount = c.TotalAmount,
+            DocumentsUploaded = c.DocumentsUploaded ?? "-",
+            ClaimDate = c.ClaimDate,
+            ClaimStatus = c.ClaimStatus
+        }).ToListAsync();
             
             return View(verifiedClaims);
         }
@@ -394,47 +407,60 @@ namespace Part1ex.Controllers
 
 
         [HttpPost]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ApproveClaim(int claimid)//this is for the coordinator
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Program Coordinator")
-                return RedirectToAction("Index");
+            try {
+                var role = HttpContext.Session.GetString("UserRole");
+                if (role != "Program Coordinator")
+                    return Json(new { success = false, message = "Unauthorized" });
 
-            var claim = await _dbContext.Claims.FindAsync(claimid);
-            if (claim != null)
-            {
+                var coordinatorName = HttpContext.Session.GetString("UserName");
+                if (string.IsNullOrEmpty(coordinatorName))
+                    return Json(new { success = false, message = "Coordinator not found in sessions" });
+
+                var claim = await _dbContext.Claims.FindAsync(claimid);
+                if (claim == null)
+                    return Json(new { success = false, message = "claim not found" });
+
+                if (claim.ClaimStatus != "Pending")
+                    return Json(new { success = false, message = "Only pending claims can be verified" });
+
+
                 claim.ClaimStatus = "Verified";
+                claim.VerifiedBy = coordinatorName;
                 await _dbContext.SaveChangesAsync();
-                TempData["Message"] = $"Claim{claim.claimid} has been Verified.";
+                return Json(new { success = true, message = $"Claim #{claim.claimid} has been verified." });
+            } catch (Exception ex) 
+                {
+                    return Json(new { success = false, message = $"Server error: {ex.Message}" });
+                }
             }
-            else
-            {
-                TempData["Message"] = "Claim not found";
-            }
-                return RedirectToAction("ViewClaims");
-        }
 
         [HttpPost]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RejectClaim(int claimid)//this is for the coordinator
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Program Coordinator")
-                return RedirectToAction("Index");
-
-            var claim = await _dbContext.Claims.FindAsync(claimid);
-            if (claim != null)
+            try
             {
+                var role = HttpContext.Session.GetString("UserRole");
+                if (role != "Program Coordinator")
+                    return Json(new { success = false, message = "Unauthorized" });
+
+                var claim = await _dbContext.Claims.FindAsync(claimid);
+                if (claim == null)
+                    return Json(new { success = false, message = "Claim not found." });
+
+                if (claim.ClaimStatus != "Pending")
+                    return Json(new { success = false, message = "Only pending claims can be denied." });
+
                 claim.ClaimStatus = "Denied";
                 await _dbContext.SaveChangesAsync();
-                TempData["Message"] = $"Claim {claim.claimid} Denied.";
+
+                return Json(new { success = true, message = $"Claim #{claim.claimid} has been denied." });
             }
-            else
+            catch (Exception ex)
             {
-                TempData["Message"] = "Claim not found.";
+                return Json(new { success = false, message = $"Server error: {ex.Message}" });
             }
-                return RedirectToAction("CoordinatorDashboard");
         }
 
         [HttpPost]
