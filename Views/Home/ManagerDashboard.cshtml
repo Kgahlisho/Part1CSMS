@@ -45,9 +45,12 @@ else
                 <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                 <td><span class="badge badge-info">@claim.ClaimStatus</span></td>
                 <td>
-                    <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaimManager", "Home", new { claimid = claim.claimid })">Approve</a>
-                    <br />
-                    <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaimManager", "Home", new { claimid = claim.claimid })">Reject</a>
+                    <button class="btn btn-success btn-sm approve-claim-btn" data-claimid="@claim.claimid">
+                        Approve
+                    </button>
+                    <button class="btn btn-danger btn-sm reject-claim-btn" data-claimid="@claim.claimid">
+                        Reject
+                    </button>
                 </td>
             </tr>
         }
@@ -143,4 +146,92 @@ else
     }
 }
 </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
+            // Approve claim
+            document.querySelectorAll(".approve-claim-btn").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const claimId = this.dataset.claimid;
+
+                    const result = await Swal.fire({
+                        title: "Confirm Approval",
+                        text: `Are you sure you want to approve claim #${claimId}?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, approve it",
+                        cancelButtonText: "Cancel",
+                        reverseButtons: true
+                    });
+
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const response = await fetch(`/Home/ApproveClaimManager`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `claimid=${claimId}`,
+                            credentials: 'same-origin'
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            await Swal.fire("Approved!", data.message, "success");
+                            location.reload();
+                        } else {
+                            Swal.fire("Error", data.message, "error");
+                        }
+                    } catch (err) {
+                        console.error("Fetch error (approve):", err);
+                        Swal.fire("Error", "Something went wrong. Check console for details.", "error");
+                    }
+                });
+            });
+
+            // Reject claim
+            document.querySelectorAll(".reject-claim-btn").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const claimId = this.dataset.claimid;
+
+                    const result = await Swal.fire({
+                        title: "Confirm Rejection",
+                        text: `Are you sure you want to deny claim #${claimId}?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, deny it",
+                        cancelButtonText: "Cancel",
+                        reverseButtons: true
+                    });
+
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const response = await fetch(`/Home/RejectClaimManager`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `claimid=${claimId}`,
+                            credentials: 'same-origin'
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            await Swal.fire("Denied!", data.message, "success");
+                            location.reload();
+                        } else {
+                            Swal.fire("Error", data.message || "Operation failed.", "error");
+                          }
+                        }catch (err) {
+                          console.error("Fetch error:", err);
+                          Swal.fire("Error", "A network or server error occurred.", "error");
+                        }
+                });
+            }); 
+        });
+    </script>
+}

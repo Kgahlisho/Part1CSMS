@@ -283,10 +283,10 @@ deleteButtons.forEach(btn => {
 
         const result = await Swal.fire({
             title: "Are you sure?",
-            text: `You are about to delete claim #${claimId}. This action cannot be undone!`,
+            text: `You are about to delete claim No.${claimId}. This action cannot be undone!`,
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, Delete",
+            confirmButtonText: "Yes , Delete",
             cancelButtonText: "Cancel",
             reverseButtons: true
         });
@@ -297,8 +297,8 @@ deleteButtons.forEach(btn => {
             const response = await fetch('/Home/DeleteClaim', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    'Content-Type': 'application/json'
+                   // 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 },
                 body: JSON.stringify({ id: claimId })
             });
@@ -308,7 +308,7 @@ deleteButtons.forEach(btn => {
             if (data.success) {
                 await Swal.fire({
                     title: "Deleted!",
-                    text: `Claim #${claimId} has been deleted successfully.`,
+                    text: `Claim No.${claimId} has been deleted successfully.`,
                     icon: "success",
                     confirmButtonText: "OK"
                 });
@@ -323,4 +323,5 @@ deleteButtons.forEach(btn => {
 });
 
 	</script>
+
 }

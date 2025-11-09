@@ -309,11 +309,15 @@ namespace Part1ex.Controllers
 
 
         //DELETE Claim
+        public class DeleteClaimRequest
+        {
+            public int Id { get;set; }
+        }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteClaim([FromBody]int id)
+        public async Task<IActionResult> DeleteClaim([FromBody] DeleteClaimRequest request)
         {
-            var claim = await _dbContext.Claims.FindAsync(id);
+            var claim = await _dbContext.Claims.FindAsync(request.Id);
             if (claim == null)
                 return Json(new { success = false, message = "claim not found." });
 
@@ -324,7 +328,7 @@ namespace Part1ex.Controllers
 
             _dbContext.Claims.Remove(claim);
             await _dbContext.SaveChangesAsync();
-            return Json(new { success = true, message = $"claim #{id} deleted successfully." });
+            return Json(new { success = true, message = $"claim #{request.Id} deleted successfully." });
         }
 
 
@@ -389,7 +393,8 @@ namespace Part1ex.Controllers
 
 
 
-
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ApproveClaim(int claimid)//this is for the coordinator
         {
             var role = HttpContext.Session.GetString("UserRole");
@@ -410,7 +415,8 @@ namespace Part1ex.Controllers
                 return RedirectToAction("ViewClaims");
         }
 
-
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RejectClaim(int claimid)//this is for the coordinator
         {
             var role = HttpContext.Session.GetString("UserRole");
@@ -431,55 +437,66 @@ namespace Part1ex.Controllers
                 return RedirectToAction("CoordinatorDashboard");
         }
 
-
+        [HttpPost]
+     [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ApproveClaimManager(int claimid)//this is used by the Manager
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Program Manager")
-                return RedirectToAction("Index");
+            try
+            {
+                var role = HttpContext.Session.GetString("UserRole");
+                //quick log here
+                _logger.LogInformation( $"ApproveClaimManager called. Role={role}, claimid={claimid}");
+                
+                if (role != "Program Manager")
+                    return Json(new { success = false, message = "Unauthorized" });
 
-            // Check for valid index and that the claim is Verified
-            var claim = await _dbContext.Claims.FindAsync(claimid);
-            if (claim == null)
-            {
-                TempData["Message"] = "Claim not found.";
-            } 
-            else if (claim.ClaimStatus == "Verified")
-            {
+                // Check for valid index and that the claim is Verified
+                var claim = await _dbContext.Claims.FindAsync(claimid);
+                if (claim == null)
+                    return Json(new { success = false, message = "claim not found." });
+
+                if (claim.ClaimStatus != "Verified")
+                    return Json(new { success = false, message = "claim is not verified." });
+
+
                 claim.ClaimStatus = "Approved";
                 await _dbContext.SaveChangesAsync();
-                TempData["Message"] = $"Claim {claim.claimid} Approved successfully.";
 
+                return Json(new { success = true, message = $"claim No.{claim.claimid} approved." });
             }
-            else
+            catch (Exception ex)
             {
-                TempData["Message"] = "Invalid claim selection or claim not verified yet.";
+                return Json(new { success = false, message = $"Server error: {ex.Message}" });
             }
-            return RedirectToAction("ManagerDashboard");
         }
 
+        [HttpPost]
+       [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RejectClaimManager(int claimid)//this is used by the Manager
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Program Manager")
-                return RedirectToAction("Index");
-
-            // Check for valid index and that the claim is Verified
-            var claim = await _dbContext.Claims.FindAsync(claimid);
-            if (claim != null && claim.ClaimStatus == "Verified")
+            try
             {
+                var role = HttpContext.Session.GetString("UserRole");
+                if (role != "Program Manager")
+                    return Json(new { success = false, message = "Unauthorized" });
+
+                var claim = await _dbContext.Claims.FindAsync(claimid);
+                if (claim == null)
+                    return Json(new { success = false, message = "Claim not found." });
+
+                if (claim.ClaimStatus != "Verified")
+                    return Json(new { success = false, message = "Claim is not verified." });
+
                 claim.ClaimStatus = "Denied";
                 await _dbContext.SaveChangesAsync();
-                TempData["Message"] = $"Claim {claim.claimid} Denied successfully.";
+
+                return Json(new { success = true, message = $"Claim #{claim.claimid} denied successfully." });
             }
-            else
+            catch (Exception ex)
             {
-                TempData["Message"] = "Invalid claim selection or claim is not verified.";
+                return Json(new { success = false, message = $"Server error: {ex.Message}" });
             }
-
-            return RedirectToAction("ManagerDashboard");
         }
-
 
 
         public async Task<IActionResult> ViewClaims()//for the coordinator to be able to t=see the claims made by lecturer

@@ -51,10 +51,14 @@
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                             <td><span class="badge badge-warning">@claim.ClaimStatus</span></td>
                             <td>
-                                <a class="btn btn-success btn-sm" href="@Url.Action("ApproveClaim" , "Home", new { claimid = claim.claimid})">Verify</a>
-                                <br />
-                                <a class="btn btn-danger btn-sm" href="@Url.Action("RejectClaim" , "Home", new { claimid = claim.claimid})">Deny</a>
+                                <button class="btn btn-success btn-sm approve-claim-btn" data-claimid="@claim.claimid">
+                                    Verify
+                                </button>
+                                <button class="btn btn-danger btn-sm reject-claim-btn" data-claimid="@claim.claimid">
+                                    Deny
+                                </button>
                             </td>
+
                         </tr>
                     }
                 </tbody>
@@ -198,3 +202,91 @@
     }
 </div>
 
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Approve claim
+           document.querySelectorAll(".verify-claim-btn").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const claimId = this.dataset.claimid;
+                    const result = await Swal.fire({
+                        title: "Confirm Verification",
+                        text: `Are you sure you want to verify claim #${claimId}?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, verify it",
+                        cancelButtonText: "Cancel",
+                        reverseButtons: true
+                    });
+
+
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const response = await fetch(`/Home/ApproveClaimManager`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            body: `claimid=${claimId}`,
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            await Swal.fire("Approved!", data,message , "success");
+                            location.reload();
+                        } else {
+                            Swal.fire("Error", data.message, "error");
+                        }
+                    } catch (err) {
+                        Swal.fire("Error", "Something went wrong.", "error");
+                    }
+                });
+            });
+
+            // Reject claim
+           document.querySelectorAll(".deny-claim-btn").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const claimId = this.dataset.claimid;
+                    const result = await Swal.fire({
+                        title: "Confirm Denial",
+                        text: `Are you sure you want to deny claim #${claimId}?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, deny it",
+                        cancelButtonText: "Cancel",
+                        reverseButtons: true
+                    });
+
+
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const response = await fetch(`/Home/RejectClaimManager`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            body: `claimid=${claimId}`,
+                              credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            await Swal.fire("Denied!", data,message  , "success");
+                            location.reload();
+                        } else {
+                            Swal.fire("Error", data.message, "error");
+                        }
+                    } catch (err) {
+                        Swal.fire("Error", "Something went wrong.", "error");
+                    }
+                });
+            });
+
+        });
+    </script>
+}
