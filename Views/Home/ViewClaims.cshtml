@@ -3,14 +3,12 @@
     <a class="btn btn-primary" href="@Url.Action("CoordinatorDashboard","Home")"> Back to Dashboard</a>
 
 <div class="container">
+    <br />
+    <h2 class="dashboard-heading">Submitted claims :</h2>
 
-
-<br />
-	<h2 class="dashboard-heading">Submitted claims :</H2>
-
-        <div class="text-end mb-3">
-             <button id="filterButton" class="btn btn-info">Filter Claims</button>
-        </div>
+    <div class="text-end mb-3">
+        <button id="filterButton" class="btn btn-info">Filter Claims</button>
+    </div>
 
     @if (!Model.Any())
     {
@@ -19,14 +17,16 @@
     else
     {
         var pendingClaims = Model.Where(c => c.ClaimStatus == "Pending").ToList();
-        var verifiedClaims = Model.Where(c => c.ClaimStatus == "Verified").ToList();//awaiting manager approval.
+        var verifiedClaims = Model.Where(c => c.ClaimStatus == "Verified").ToList();
+        var approvedClaims = Model.Where(c => c.ClaimStatus == "Approved").ToList();
         var deniedClaims = Model.Where(c => c.ClaimStatus == "Denied").ToList();
-        var approvedClaims = Model.Where(c => c.ClaimStatus == "Approved").ToList(); 
 
-        <!-- Pending / New Claims -->
-        <h3>New Claims to Verify (@pendingClaims.Count)</h3>
-        @if (pendingClaims.Any())
+        var selectedStatus = ViewBag.SelectedStatus as string ?? "All";
+
+        //  Pending Claims
+        if ((selectedStatus == "All" || selectedStatus == "Pending") && pendingClaims.Any())
         {
+            <h3>New Claims to Verify (@pendingClaims.Count)</h3>
             <table class="table table-warning">
                 <thead>
                     <tr>
@@ -54,29 +54,19 @@
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
                             <td><span class="badge bg-warning">@claim.ClaimStatus</span></td>
                             <td>
-                                <button class="btn btn-success btn-sm approve-claim-btn" data-claimid="@claim.claimid">
-                                    Verify
-                                </button>
-                                <button class="btn btn-danger btn-sm reject-claim-btn" data-claimid="@claim.claimid">
-                                    Deny
-                                </button>
+                                <button class="btn btn-success btn-sm approve-claim-btn" data-claimid="@claim.claimid">Verify</button>
+                                <button class="btn btn-danger btn-sm reject-claim-btn" data-claimid="@claim.claimid">Deny</button>
                             </td>
-
                         </tr>
                     }
                 </tbody>
             </table>
-        
-        }
-        else
-        {
-            <p class="alert alert-info">No new claims to verify.</p>
         }
 
-        <!-- Verified / awaiting managers approval Claims -->
-        <h3>Verified Claims (@verifiedClaims.Count)</h3>
-        @if (verifiedClaims.Any())
+        // Verified Claims
+        if ((selectedStatus == "All" || selectedStatus == "Verified") && verifiedClaims.Any())
         {
+            <h3>Verified Claims (@verifiedClaims.Count)</h3>
             <table class="table table-success">
                 <thead>
                     <tr>
@@ -110,61 +100,51 @@
                     }
                 </tbody>
             </table>
-}
-        else
-        {
-            <p class="alert alert-info">No verified claims yet.</p>
         }
 
-         <!-- Approved Claims -->
-    <h3>Approved Claims (@approvedClaims.Count)</h3>
-    @if (approvedClaims.Any())
-    {
-        <table class="table table-success">
-            <thead>
-                <tr>
-                    <th>Claim ID</th>
-                    <th>Lecturer</th>
-                    <th>Approved By</th>
-                    <th>Hours Worked</th>
-                    <th>Hourly Rate</th>
-                    <th>Total Amount</th>
-                    <th>Documents</th>
-                    <th>Claim Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var claim in approvedClaims)
-                {
-                    <tr>
-                        <td>@claim.claimid</td>
-                        <td>@claim.Lecturer</td>
-                        <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
-                        <td>@claim.HoursWorked</td>
-                        <td>R @claim.HourlyRate</td>
-                        <td>R @claim.TotalAmount</td>
-                        <td>@(claim.DocumentsUploaded ?? "None")</td>
-                        <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                        <td><span class="badge bg-success">@claim.ClaimStatus</span></td>
-                        <td><span>Checked</span></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p class="alert alert-info">No approved claims yet.</p>
-    }
-
-
-
-        <!-- Denied Claims -->
-        <h3>Denied Claims (@deniedClaims.Count)</h3>
-        @if (deniedClaims.Any())
+        // Approved Claims
+        if ((selectedStatus == "All" || selectedStatus == "Approved") && approvedClaims.Any())
         {
+            <h3>Approved Claims (@approvedClaims.Count)</h3>
+            <table class="table table-success">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Lecturer</th>
+                        <th>Approved By</th>
+                        <th>Hours Worked</th>
+                        <th>Hourly Rate</th>
+                        <th>Total Amount</th>
+                        <th>Documents</th>
+                        <th>Claim Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var claim in approvedClaims)
+                    {
+                        <tr>
+                            <td>@claim.claimid</td>
+                            <td>@claim.Lecturer</td>
+                            <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
+                            <td>@claim.HoursWorked</td>
+                            <td>R @claim.HourlyRate</td>
+                            <td>R @claim.TotalAmount</td>
+                            <td>@(claim.DocumentsUploaded ?? "None")</td>
+                            <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="badge bg-success">@claim.ClaimStatus</span></td>
+                            <td><span>Checked</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        // Denied Claims
+        if ((selectedStatus == "All" || selectedStatus == "Denied") && deniedClaims.Any())
+        {
+            <h3>Denied Claims (@deniedClaims.Count)</h3>
             <table class="table table-danger">
                 <thead>
                     <tr>
@@ -186,27 +166,18 @@
                         <tr>
                             <td>@claim.claimid</td>
                             <td>@claim.Lecturer</td>
-                             <td>@(string.IsNullOrEmpty(claim.DeniedBy) ? "-" : claim.DeniedBy)</td>
-                       <td>@claim.HoursWorked</td>
+                            <td>@(string.IsNullOrEmpty(claim.DeniedBy) ? "-" : claim.DeniedBy)</td>
+                            <td>@claim.HoursWorked</td>
                             <td>R @claim.HourlyRate</td>
                             <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                           <td><span class="badge bg-danger">@claim.ClaimStatus</span></td>
+                            <td><span class="badge bg-danger">@claim.ClaimStatus</span></td>
                             <td><span>Checked</span></td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-        else
-        {
-            <p class="alert alert-info">No denied claims.</p>
-        }
-
-        @if (TempData["Message"] != null)
-        {
-            <p style="color:green">@TempData["Message"]</p>
         }
     }
 </div>
