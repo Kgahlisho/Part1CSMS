@@ -332,16 +332,46 @@ namespace Part1ex.Controllers
         }
 
 
-        public async Task<IActionResult> Claims_Dashboard()//now it feathces from EF 
+        public async Task<IActionResult> Claims_Dashboard(string? status)//now it feathces from EF //lecture dashboard
         {
-            var lecturerName = HttpContext.Session.GetString("UserName");
-            if (string.IsNullOrEmpty(lecturerName)) return RedirectToAction("Index");
+            try
+            {
+                var lecturerName = HttpContext.Session.GetString("UserName");
+                if (string.IsNullOrEmpty(lecturerName))
+                {
+                    TempData["ClaimError"] = "You must login first";
+                    return RedirectToAction("Index");
+                }
 
-            
-            var claims = await _dbContext.Claims.Where(c => c.Lecturer == lecturerName).ToListAsync();
-            return View(claims);
+                IQueryable<Calculations> query = _dbContext.Claims
+             .Where(c => c.Lecturer == lecturerName);
+
+                // Filter by status if provided
+                if (!string.IsNullOrEmpty(status) && status != "All")
+                {
+                    query = query.Where(c => c.ClaimStatus == status);
+                }
+
+                // Execute query
+                var claims = await query
+                    .OrderByDescending(c => c.ClaimDate)
+                    .ToListAsync();
+
+                // Pass data to view
+                ViewBag.UserName = lecturerName;
+                ViewBag.SelectedStatus = status ?? "All";
+
+                return View(claims);
+            }
+            catch (Exception ex)
+            {
+                {
+                    _logger.LogError(ex, "Failed to load claims");
+                    TempData["CliamError"] = "Something went wrong , please try again";
+                    return RedirectToAction("Dashboard");
+                }
+            }
         }
-
 
 
         //thehn here we make sure that the documents are uploaded and it taks us back to the claims
@@ -364,15 +394,31 @@ namespace Part1ex.Controllers
 
 
         //We then create dashboards for the other roles 
-        public async Task<IActionResult> CoordinatorDashboard()
+        public async Task<IActionResult> CoordinatorDashboard(string? status, string? lecturer)
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Program Coordinator")
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("Index");
+
+            IQueryable<Calculations> query = _dbContext.Claims;
+
+            if (!string.IsNullOrEmpty(status) && status !="All")
+                query = query.Where(c => c.ClaimStatus == status);
+
+            if (!string.IsNullOrEmpty(lecturer) && lecturer != "All")
+                query = query.Where(c => c.Lecturer == lecturer);
+
+            var claims = await query.OrderByDescending(c => c.ClaimDate).ToListAsync();
 
 
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
-            var claims = await _dbContext.Claims.ToListAsync();
+            ViewBag.SelectedStatus = status ?? "All";
+            ViewBag.SelectedLecturer = lecturer ?? "All";
+
+            ViewBag.AllLecturers = await _dbContext.Claims
+              .Select(c => c.Lecturer)
+              .Distinct()
+              .ToListAsync();
             return View("ViewClaims" , claims);
         }
 
@@ -444,7 +490,9 @@ namespace Part1ex.Controllers
                 var role = HttpContext.Session.GetString("UserRole");
                 if (role != "Program Coordinator")
                     return Json(new { success = false, message = "Unauthorized" });
-
+              
+                var coordinatorName = HttpContext.Session.GetString("UserName") ?? "Unknown Coordinator";
+               
                 var claim = await _dbContext.Claims.FindAsync(claimid);
                 if (claim == null)
                     return Json(new { success = false, message = "Claim not found." });
@@ -453,6 +501,7 @@ namespace Part1ex.Controllers
                     return Json(new { success = false, message = "Only pending claims can be denied." });
 
                 claim.ClaimStatus = "Denied";
+                claim.DeniedBy = coordinatorName;
                 await _dbContext.SaveChangesAsync();
 
                 return Json(new { success = true, message = $"Claim #{claim.claimid} has been denied." });
@@ -486,6 +535,7 @@ namespace Part1ex.Controllers
 
 
                 claim.ClaimStatus = "Approved";
+                claim.VerifiedBy = claim.VerifiedBy;
                 await _dbContext.SaveChangesAsync();
 
                 return Json(new { success = true, message = $"claim No.{claim.claimid} approved." });

@@ -13,14 +13,30 @@
 	<h1 class="dashboard-heading">Welcome to your Claims</h1>
 	<h2 class="dashboard-heading">Total claims made Below: @(Model?.Count ?? 0)</h2>
 
-@if (Model != null && Model.Any())
-{
+	<div class="text-end mb-3">
+		<button id="filterButton" class="btn btn-info">Filter Claims</button>
+	</div>
 
-	var pendingClaims = Model.Where(c => c.ClaimStatus == "Pending").ToList();
-	var approvedClaims = Model.Where(c => c.ClaimStatus == "Approved").ToList();
-	var deniedClaims = Model.Where(c => c.ClaimStatus == "Denied").ToList();
+	@{ 
+		string selected = ViewBag.SelectedStatus ?? "All"; 
 
-	<!--new claims-->
+		var pendingClaims = Model.Where(c => c.ClaimStatus == "Pending").ToList();
+		var approvedClaims = Model.Where(c => c.ClaimStatus == "Approved").ToList();
+		var deniedClaims = Model.Where(c => c.ClaimStatus == "Denied").ToList();
+	}
+	@*Show "No claims made yet" only if there are literally no claims *@
+@if (Model == null || !Model.Any())
+	{
+			<p class="alert alert-info">No pending claims.</p>
+		
+	}
+		else
+	{
+		@*Pending Claims*@
+	@if (selected == "All" || selected == "Pending")
+
+
+	{
 	<h3> Pending / new claims (@pendingClaims.Count)</h3>
 	@if (pendingClaims.Any())
 		{
@@ -44,7 +60,7 @@
 							<td>R @pendingClaims[i].TotalAmount.ToString("0.00")</td>
 							<td>@pendingClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(pendingClaims[i].DocumentsUploaded ?? "None")</td>
-							<td><span class="badge badge-warning">@pendingClaims[i].ClaimStatus</span></td>
+							<td><span class="badge bg-warning">@pendingClaims[i].ClaimStatus</span></td>
 							<td>
 								<button class="btn btn-warning btn-sm edit-claim-btn"
 										data-id="@pendingClaims[i].claimid"
@@ -68,10 +84,12 @@
 		{
 			<p class="alert alert-info">No pending claims.</p>
 		}
-
+	}
 		<br />
 
-
+		@*Approved Claims*@
+		@if (selected == "All" || selected == "Approved")
+		{
 		<!--Approved claims-->
 		<h3>Approved Claims (@approvedClaims.Count)</h3>
 		@if (approvedClaims.Any())
@@ -96,7 +114,7 @@
 							<td>R @approvedClaims[i].TotalAmount.ToString("0.00")</td>
 							<td>@approvedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(approvedClaims[i].DocumentsUploaded ?? "None")</td>
-							<td><span class="badge badge-success">@approvedClaims[i].ClaimStatus</span></td>
+							<td><span class="badge bg-success">@approvedClaims[i].ClaimStatus</span></td>
 							
 
 						</tr>
@@ -108,9 +126,12 @@
 		{
 			<p class="alert alert-info">No approved claims.</p>
 		}
+	}
 
 		<br />
-
+		@*Denied Claims*@
+		@if (selected == "All" || selected == "Denied")
+		{
 		<!-- Denied Claims -->
 		<h3>Denied Claims (@deniedClaims.Count)</h3>
 		@if (deniedClaims.Any())
@@ -135,7 +156,7 @@
 							<td>R @deniedClaims[i].TotalAmount.ToString("0.00")</td>
 							<td>@deniedClaims[i].ClaimDate.ToString("yyyy-MM-dd")</td>
 							<td>@(deniedClaims[i].DocumentsUploaded ?? "None")</td>
-							<td><span class="badge badge-danger">@deniedClaims[i].ClaimStatus</span></td>
+							<td><span class="badge bg-danger">@deniedClaims[i].ClaimStatus</span></td>
 						</tr>
 					}
 				</tbody>
@@ -145,16 +166,14 @@
 		{
 			<p class="alert alert-info"> No denied claims.</p>
 		}
-
-		<div style="margin-top: 1.5rem;" class="buttons">
-			<a class="btn btn-success" href="@Url.Action("Claims", "Home")">Submit a New Claim</a>
-		</div>
-
 	}
-	else
-	{
-		<p class ="alert alert-info">No claims made yet.</p>
 	}
+	
+	
+
+	<div style="margin-top: 1.5rem;" class="buttons">
+		<a class="btn btn-success" href="@Url.Action("Claims", "Home")">Submit a New Claim</a>
+	</div>
 	</div>
 
 <!-- Edit Claim -->
@@ -322,6 +341,38 @@ deleteButtons.forEach(btn => {
     });
 });
 
+
+//SCript for the pop-up filter
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			document.getElementById("filterButton").addEventListener("click", async function () {
+				const { value: selectedStatus } = await Swal.fire({
+					title: "Filter Claims",
+					input: "select",
+					inputOptions: {
+						All: "All",
+						Pending: "Pending",
+						Approved: "Approved",
+						Denied: "Denied"
+					},
+					inputPlaceholder: "Select claim status",
+					showCancelButton: true,
+					confirmButtonText: "Apply Filter",
+					cancelButtonText: "Cancel",
+					icon: "info",
+					inputValidator: (value) => {
+						if (!value) {
+							return "Please select a filter option.";
+						}
+					}
+				});
+
+				if (selectedStatus){
+							window.location.href=`/Home/Claims_Dashboard?status=${selectedStatus}`;
+				}
+				});
+				});
 	</script>
 
 }

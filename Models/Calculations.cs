@@ -29,8 +29,8 @@ namespace Part1ex.Models
         public string? Lecturer { get; set; }//makeed it nullable.
 
         public string? VerifiedBy { get; set; } 
-
-        //public string? ApprovedByManager { get; set; }
+        public string? DeniedBy { get; set; }
+                //public string? ApprovedByManager { get; set; }
     }
     
 }

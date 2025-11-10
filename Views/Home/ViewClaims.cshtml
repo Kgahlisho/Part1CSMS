@@ -8,6 +8,9 @@
 <br />
 	<h2 class="dashboard-heading">Submitted claims :</H2>
 
+        <div class="text-end mb-3">
+             <button id="filterButton" class="btn btn-info">Filter Claims</button>
+        </div>
 
     @if (!Model.Any())
     {
@@ -49,7 +52,7 @@
                             <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                            <td><span class="badge badge-warning">@claim.ClaimStatus</span></td>
+                            <td><span class="badge bg-warning">@claim.ClaimStatus</span></td>
                             <td>
                                 <button class="btn btn-success btn-sm approve-claim-btn" data-claimid="@claim.claimid">
                                     Verify
@@ -79,6 +82,7 @@
                     <tr>
                         <th>Claim ID</th>
                         <th>Lecturer</th>
+                        <th>Verified By</th>
                         <th>Hours Worked</th>
                         <th>Hourly Rate</th>
                         <th>Total Amount</th>
@@ -94,12 +98,13 @@
                         <tr>
                             <td>@claim.claimid</td>
                             <td>@claim.Lecturer</td>
+                            <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
                             <td>@claim.HoursWorked</td>
                             <td>R @claim.HourlyRate</td>
                             <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                            <td><span class="badge badge-info">@claim.ClaimStatus</span></td>
+                            <td><span class="badge bg-secondary">@claim.ClaimStatus</span></td>
                             <td><span>Checked</span></td>
                         </tr>
                     }
@@ -120,6 +125,7 @@
                 <tr>
                     <th>Claim ID</th>
                     <th>Lecturer</th>
+                    <th>Approved By</th>
                     <th>Hours Worked</th>
                     <th>Hourly Rate</th>
                     <th>Total Amount</th>
@@ -135,12 +141,13 @@
                     <tr>
                         <td>@claim.claimid</td>
                         <td>@claim.Lecturer</td>
+                        <td>@(string.IsNullOrEmpty(claim.VerifiedBy) ? "-" : claim.VerifiedBy)</td>
                         <td>@claim.HoursWorked</td>
                         <td>R @claim.HourlyRate</td>
                         <td>R @claim.TotalAmount</td>
                         <td>@(claim.DocumentsUploaded ?? "None")</td>
                         <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                        <td><span class="badge badge-primary">@claim.ClaimStatus</span></td>
+                        <td><span class="badge bg-success">@claim.ClaimStatus</span></td>
                         <td><span>Checked</span></td>
                     </tr>
                 }
@@ -163,6 +170,7 @@
                     <tr>
                         <th>Claim ID</th>
                         <th>Lecturer</th>
+                        <th>Denied By</th>
                         <th>Hours Worked</th>
                         <th>Hourly Rate</th>
                         <th>Total Amount</th>
@@ -178,12 +186,13 @@
                         <tr>
                             <td>@claim.claimid</td>
                             <td>@claim.Lecturer</td>
-                            <td>@claim.HoursWorked</td>
+                             <td>@(string.IsNullOrEmpty(claim.DeniedBy) ? "-" : claim.DeniedBy)</td>
+                       <td>@claim.HoursWorked</td>
                             <td>R @claim.HourlyRate</td>
                             <td>R @claim.TotalAmount</td>
                             <td>@(claim.DocumentsUploaded ?? "None")</td>
                             <td>@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
-                            <td><span class="badge badge-danger">@claim.ClaimStatus</span></td>
+                           <td><span class="badge bg-danger">@claim.ClaimStatus</span></td>
                             <td><span>Checked</span></td>
                         </tr>
                     }
@@ -275,5 +284,47 @@
                 });
             });
         });
+
+        //filter
+
+        document.getElementById("filterButton").addEventListener("click", async function () {
+    // Build lecturer options dynamically from ViewBag
+    const lecturers = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.AllLecturers));
+    const lecturerOptions = { "All": "All" };
+    lecturers.forEach(l => { lecturerOptions[l] = l; });
+
+    const { value: filters } = await Swal.fire({
+        title: "Filter Claims",
+        html:
+            `<select id="statusSelect" class="swal2-select">
+                <option value="All">All</option>
+                <option value="Pending">New/Pending</option>
+                <option value="Verified">Verified</option>
+                <option value="Approved">Approved</option>
+                <option value="Denied">Denied</option>
+            </select>
+            <br/><br/>
+            <select id="lecturerSelect" class="swal2-select">
+                ${Object.keys(lecturerOptions).map(l => `<option value="${l}">${lecturerOptions[l]}</option>`).join('')}
+            </select>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Apply Filter",
+        preConfirm: () => {
+            return {
+                status: document.getElementById('statusSelect').value,
+                lecturer: document.getElementById('lecturerSelect').value
+            }
+        }
+    });
+
+    if (filters) {
+        const url = `/Home/CoordinatorDashboard?status=${filters.status}&lecturer=${filters.lecturer}`;
+        window.location.href = url;
+    }
+});
+
+
+
     </script>
 }
